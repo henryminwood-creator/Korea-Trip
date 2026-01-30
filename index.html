@@ -4,1007 +4,2353 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Churros take South Korea</title>
-  <meta name="description" content="Shared trip hub · lightweight + offline-friendly" />
+  <meta name="description" content="A lightweight, shareable trip-planning hub for Churros take South Korea." />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
   <style>
-    :root{
-      --bg:#fbfbfd;
-      --card:#ffffff;
-      --muted:#6b7280;
-      --text:#0f172a;
-      --border:#e5e7eb;
-      --shadow: 0 10px 30px rgba(2,6,23,.08);
-      --shadow2: 0 6px 18px rgba(2,6,23,.06);
-      --accent:#4f46e5; /* indigo */
-      --accent2:#06b6d4; /* cyan */
-      --good:#16a34a;
-      --warn:#f59e0b;
-      --bad:#ef4444;
-      --radius:18px;
-      --radius2:14px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    :root {
+      --bg: #f7f8fb;
+      --panel: #ffffff;
+      --panel2: #fbfbfe;
+      --text: #101326;
+      --muted: #5a6178;
+      --border: rgba(16,19,38,.10);
+      --shadow: 0 12px 30px rgba(16,19,38,.08);
+      --shadow2: 0 10px 18px rgba(16,19,38,.07);
+      --accent: #6E50FF;
+      --accent2: #1FD4B5;
+      --danger: #ff4d6d;
+      --warn: #ffb703;
+      --ok: #22c55e;
+      --radius: 18px;
+      --radius2: 12px;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: var(--sans);
-      color:var(--text);
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
       background:
-        radial-gradient(1000px 600px at 10% -10%, rgba(79,70,229,.16), transparent 60%),
-        radial-gradient(900px 500px at 90% 0%, rgba(6,182,212,.14), transparent 55%),
+        radial-gradient(900px 420px at 20% -10%, rgba(110,80,255,.18), transparent 60%),
+        radial-gradient(850px 520px at 100% 10%, rgba(31,212,181,.14), transparent 55%),
+        radial-gradient(900px 480px at 40% 110%, rgba(255,183,3,.12), transparent 50%),
         var(--bg);
     }
-    a{color:inherit}
-    .wrap{max-width:1200px;margin:0 auto;padding:22px 18px 36px}
-    header{
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
-      padding:16px 18px;
-      background:rgba(255,255,255,.75);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow: var(--shadow2);
+    a { color: inherit; }
+    .app {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 18px;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+    }
+    .side {
+      position: sticky;
+      top: 18px;
+      height: calc(100vh - 36px);
+      background: rgba(255,255,255,.76);
       backdrop-filter: blur(10px);
-      position: sticky; top: 14px; z-index: 20;
-    }
-    .brand{
-      display:flex;align-items:center;gap:12px; min-width: 240px;
-    }
-    .logo{
-      width:40px;height:40px;border-radius:14px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow: 0 10px 20px rgba(79,70,229,.25);
-      position:relative; overflow:hidden;
-    }
-    .logo:after{
-      content:"";
-      position:absolute; inset:-20px;
-      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.6), transparent 35%);
-      transform: rotate(18deg);
-    }
-    h1{
-      font-size:18px;line-height:1.15;margin:0;
-      letter-spacing:-.02em;
-    }
-    .sub{
-      font-size:12px;color:var(--muted);margin-top:3px;
-    }
-    .right{
-      display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;
-    }
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 10px;border-radius:999px;border:1px solid var(--border);
-      background:rgba(255,255,255,.7);
-      font-size:12px;color:var(--muted);
-    }
-    .dot{width:8px;height:8px;border-radius:50%;background:var(--good)}
-    .btn{
-      appearance:none;border:1px solid var(--border);
-      background: white;
-      padding:10px 12px;border-radius:12px;
-      font-weight:600;font-size:13px;
-      box-shadow: 0 6px 16px rgba(2,6,23,.06);
-      cursor:pointer;
-      transition: transform .06s ease, box-shadow .2s ease, border-color .2s ease;
-    }
-    .btn:hover{border-color:#d1d5db; box-shadow: 0 10px 22px rgba(2,6,23,.08)}
-    .btn:active{transform: translateY(1px)}
-    .btn.primary{
-      border-color: transparent;
-      color:white;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      box-shadow: 0 14px 26px rgba(79,70,229,.18);
-    }
-    .btn.ghost{
-      background: rgba(255,255,255,.6);
-    }
-    nav{
-      display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
-      margin:18px 0 14px;
-    }
-    .tab{
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.75);
-      padding:10px 12px;border-radius:999px;
-      font-weight:700;font-size:13px;color:#334155;
-      cursor:pointer;
-      transition: background .2s ease, transform .06s ease;
-    }
-    .tab.active{
-      background: linear-gradient(135deg, rgba(79,70,229,.14), rgba(6,182,212,.14));
-      border-color: rgba(79,70,229,.28);
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:14px;
-    }
-    @media (max-width: 980px){
-      .grid{grid-template-columns: 1fr}
-      header{position:relative; top:auto}
-      .brand{min-width: auto}
-    }
-    .card{
-      background: rgba(255,255,255,.86);
-      border:1px solid var(--border);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding:16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
-    .card h2{
-      margin:0 0 10px;
-      font-size:15px; letter-spacing:-.01em;
+    @media (max-width: 980px) {
+      .side { position: relative; height: auto; }
     }
-    .muted{color:var(--muted)}
-    .kpiRow{display:grid;grid-template-columns: repeat(3,1fr); gap:10px}
-    @media (max-width:700px){ .kpiRow{grid-template-columns:1fr} }
-    .kpi{
-      border:1px solid var(--border);
+    .brand {
+      padding: 18px 18px 10px 18px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      width: 42px; height: 42px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(110,80,255,1), rgba(31,212,181,1));
+      box-shadow: 0 10px 20px rgba(110,80,255,.22);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+    .brand h1 {
+      font-size: 16px;
+      margin: 0;
+      line-height: 1.15;
+    }
+    .brand .sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .nav {
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+    .nav button {
+      width: 100%;
+      border: 1px solid var(--border);
       background: rgba(255,255,255,.7);
-      border-radius: var(--radius2);
-      padding:12px;
+      border-radius: 14px;
+      padding: 10px 12px;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: transform .08s ease, background .12s ease, border-color .12s ease;
     }
-    .kpi .label{font-size:12px;color:var(--muted);margin-bottom:6px}
-    .kpi .value{font-size:18px;font-weight:900;letter-spacing:-.02em}
-    .kpi .small{font-size:12px;color:var(--muted);margin-top:4px}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .field{
-      display:flex;flex-direction:column;gap:6px; min-width: 180px; flex: 1;
+    .nav button:hover { transform: translateY(-1px); background: rgba(255,255,255,.95); }
+    .nav button.active {
+      border-color: rgba(110,80,255,.35);
+      background: linear-gradient(180deg, rgba(110,80,255,.12), rgba(255,255,255,.85));
     }
-    label{font-size:12px;color:var(--muted)}
-    input, select, textarea{
-      width:100%;
-      border:1px solid var(--border);
-      border-radius: 12px;
-      padding:10px 10px;
-      background: rgba(255,255,255,.85);
-      font: inherit;
-      outline:none;
-      transition: border-color .2s ease, box-shadow .2s ease;
+    .nav .left {
+      display: flex; gap: 10px; align-items: center;
+      font-weight: 650;
     }
-    input:focus, select:focus, textarea:focus{
-      border-color: rgba(79,70,229,.55);
-      box-shadow: 0 0 0 4px rgba(79,70,229,.12);
+    .pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.8);
+      color: var(--muted);
     }
-    textarea{min-height:92px; resize: vertical}
-    table{
-      width:100%;
+    .footer {
+      margin-top: auto;
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+    .main {
+      min-height: calc(100vh - 36px);
+    }
+    .topbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .topbar .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.76);
+      border-radius: 999px;
+      box-shadow: var(--shadow2);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+    }
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.86);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card .hd {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .card .hd h2 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: .2px;
+    }
+    .card .bd {
+      padding: 14px 16px 16px 16px;
+    }
+    .kpi {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 560px) {
+      .kpi { grid-template-columns: 1fr; }
+    }
+    .kpi .box {
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.86), rgba(247,248,251,.65));
+    }
+    .kpi .label { font-size: 12px; color: var(--muted); }
+    .kpi .value { font-size: 18px; font-weight: 780; margin-top: 6px; }
+    .btn {
+      border: 1px solid rgba(110,80,255,.35);
+      background: rgba(110,80,255,.10);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-weight: 650;
+      transition: transform .08s ease, background .12s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+    .btn:hover { transform: translateY(-1px); background: rgba(110,80,255,.14); }
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(110,80,255,1), rgba(31,212,181,1));
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 12px 20px rgba(110,80,255,.22);
+    }
+    .btn.ghost {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.7);
+      color: var(--text);
+    }
+    .btn.danger {
+      border-color: rgba(255,77,109,.35);
+      background: rgba(255,77,109,.10);
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+    .todo {
+      display: grid;
+      grid-template-columns: 28px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 10px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,.78);
+    }
+    .todo .title { font-weight: 650; }
+    .todo .meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    input[type="checkbox"] {
+      width: 18px; height: 18px;
+      accent-color: var(--accent);
+    }
+    .table {
+      width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      overflow:hidden;
-      border-radius: 14px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.7);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(255,255,255,.82);
     }
-    th, td{
-      padding:10px 10px;
-      border-bottom:1px solid var(--border);
-      font-size:13px;
+    .table th, .table td {
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
       vertical-align: top;
     }
-    th{
-      text-align:left;
-      font-size:12px;
-      color:#475569;
-      background: rgba(2,6,23,.03);
-      font-weight:800;
+    .table th {
+      text-align: left;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(247,248,251,.7);
     }
-    tr:last-child td{border-bottom:none}
-    .tag{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:4px 8px;border-radius:999px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.8);
-      font-size:12px;
-      color:#334155;
+    .table tr:last-child td { border-bottom: none; }
+    .input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,.85);
+      outline: none;
     }
-    .tag .s{width:7px;height:7px;border-radius:50%}
-    .s.good{background:var(--good)}
-    .s.warn{background:var(--warn)}
-    .s.bad{background:var(--bad)}
-    .section{display:none}
-    .section.active{display:block}
-    .hr{height:1px;background:var(--border);margin:14px 0}
-    .smallmono{font-family:var(--mono); font-size:12px; color:#475569}
-    .toast{
-      position:fixed; left:50%; bottom:18px;
-      transform:translateX(-50%);
-      background: rgba(15,23,42,.92);
-      color:white;
-      padding:10px 12px;
+    .input:focus, select:focus { border-color: rgba(110,80,255,.42); box-shadow: 0 0 0 4px rgba(110,80,255,.10); }
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 860px) {
+      .split { grid-template-columns: 1fr; }
+    }
+    .tag {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 3px 8px;
+      border: 1px solid var(--border);
       border-radius: 999px;
-      font-size:13px;
-      box-shadow: 0 18px 40px rgba(2,6,23,.35);
-      opacity:0; pointer-events:none;
-      transition: opacity .25s ease, transform .25s ease;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255,255,255,.82);
+      margin-right: 6px;
+      margin-top: 6px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 780px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+    .place {
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.84);
+      display: grid;
+      gap: 8px;
+    }
+    .place .name { font-weight: 800; }
+    .place .mini { font-size: 12px; color: var(--muted); }
+    .place .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .muted { color: var(--muted); }
+    .mono { font-variant-numeric: tabular-nums; }
+    .modal {
+      position: fixed; inset: 0;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(16,19,38,.45);
+      backdrop-filter: blur(6px);
       z-index: 50;
     }
-    .toast.show{opacity:1; transform: translateX(-50%) translateY(-4px)}
-    .footer{
-      margin-top:14px;
-      text-align:center;
-      color:var(--muted);
-      font-size:12px;
+    .modal.open { display: grid; }
+    .modal .sheet {
+      width: min(760px, 100%);
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 22px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 30px 70px rgba(16,19,38,.25);
+      overflow: hidden;
     }
-    .people{
-      display:flex; gap:8px; flex-wrap:wrap;
+    .modal .sheet .hd {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
     }
-    .avatar{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 10px;
-      background: rgba(255,255,255,.75);
-      border:1px solid var(--border);
+    .modal .sheet .bd { padding: 14px 16px 18px 16px; }
+    .x {
+      width: 38px; height: 38px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.85);
+      cursor: pointer;
+      display: grid; place-items: center;
+      font-weight: 900;
+    }
+    .itGrid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 980px) {
+      .itGrid { grid-template-columns: 1fr; }
+    }
+    .dayList {
+      display: grid;
+      gap: 8px;
+    }
+    .dayBtn {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.78);
+      border-radius: 16px;
+      padding: 10px 12px;
+      cursor: pointer;
+      display: grid;
+      gap: 6px;
+      transition: transform .08s ease, background .12s ease;
+    }
+    .dayBtn:hover { transform: translateY(-1px); background: rgba(255,255,255,.95); }
+    .dayBtn.active {
+      border-color: rgba(110,80,255,.35);
+      background: linear-gradient(180deg, rgba(110,80,255,.12), rgba(255,255,255,.9));
+    }
+    .dayBtn .d1 { font-weight: 780; }
+    .dayBtn .d2 { font-size: 12px; color: var(--muted); }
+    .sectionBox {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255,255,255,.84);
+      overflow: hidden;
+    }
+    .sectionBox .shd {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: rgba(247,248,251,.6);
+    }
+    .sectionBox .sbd {
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+    .note {
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.8);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .note .t { font-size: 13px; line-height: 1.3; }
+    .note .small { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .note .actions { display: flex; gap: 8px; }
+    .miniBtn {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.85);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 650;
+      font-size: 12px;
+    }
+    .miniBtn:hover { background: rgba(255,255,255,.97); }
+    .bar {
+      height: 10px;
       border-radius: 999px;
-      font-size:13px;
-      font-weight:700;
+      border: 1px solid var(--border);
+      background: rgba(247,248,251,.6);
+      overflow: hidden;
     }
-    .bubble{
-      width:26px;height:26px;border-radius:999px;
-      display:grid;place-items:center;
-      color:white;
-      font-weight:900;
-      background: linear-gradient(135deg, rgba(79,70,229,.9), rgba(6,182,212,.9));
-      box-shadow: 0 10px 18px rgba(79,70,229,.18);
+    .bar > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(110,80,255,1), rgba(31,212,181,1));
+      border-radius: 999px;
+      transition: width .25s ease;
+    }
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.35;
+    }
+    .kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.8);
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
+  <script>
+    window.__INITIAL_DATA__ = {"meta":{"title":"Churros take South Korea","version":1,"created":"2026-01-30T05:21:36.404133"},"trip":{"siteTitle":"Churros take South Korea","destination":"South Korea","startDate":"","endDate":"","travellers":["Henry","Cordelia","Jesse","Oliver","Mikaela","Amy"]},"todos":[{"id":"t1","title":"Book flights","owner":"","due":"","done":false},{"id":"t2","title":"Choose neighbourhood for accommodation","owner":"","due":"","done":false},{"id":"t3","title":"Sort SIM/eSIM plan","owner":"","due":"","done":false}],"budget":{"categories":[{"id":"c1","name":"Flights","estimated":0},{"id":"c2","name":"Stay","estimated":0},{"id":"c3","name":"Transport","estimated":0},{"id":"c4","name":"Food","estimated":0},{"id":"c5","name":"Activities","estimated":0},{"id":"c6","name":"Shopping","estimated":0}],"expenses":[]},"itinerary":{"startDate":"","endDate":"","days":[],"sections":["Morning","Afternoon","Evening"],"items":{},"attractions":[],"packing":{"Henry":[],"Cordelia":[],"Jesse":[],"Oliver":[],"Mikaela":[],"Amy":[]},"polls":[],"links":[]},"attractions":[],"polls":[],"links":[],"packing":{},"__ui":{}};
+  </script>
+
+  <div class="app" id="app">
+    <aside class="side">
       <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
+        <div class="logo">🍩</div>
         <div>
-          <h1>Churros take South Korea</h1>
-          <div class="sub">Shared trip hub · lightweight + offline-friendly · local-first</div>
+          <h1 id="brandTitle">Churros take South Korea</h1>
+          <div class="sub" id="brandSub">Shared trip hub • lightweight + offline-friendly</div>
         </div>
       </div>
 
-      <div class="right">
-        <span class="pill" title="All data stays in your browser unless you export it.">
-          <span class="dot"></span>
-          Saved locally
-        </span>
-        <button class="btn ghost" id="btnQuickAdd">Quick add</button>
-        <button class="btn" id="btnExport">Export</button>
-        <button class="btn" id="btnImport">Import</button>
-        <button class="btn primary" id="btnShare">Copy share note</button>
+      <div class="nav" id="nav"></div>
+
+      <div class="footer">
+        <div><span class="pill" id="saveStatus">Saved</span></div>
+        <div class="muted">Local-first • Export to share</div>
       </div>
-    </header>
+    </aside>
 
-    <nav>
-      <button class="tab active" data-tab="overview">Overview</button>
-      <button class="tab" data-tab="itinerary">Itinerary</button>
-      <button class="tab" data-tab="budget">Budget</button>
-      <button class="tab" data-tab="decisions">Decisions</button>
-      <button class="tab" data-tab="packing">Packing</button>
-    </nav>
-
-    <!-- OVERVIEW -->
-    <section class="section active" id="overview">
-      <div class="grid">
-        <div class="card">
-          <h2>Trip snapshot</h2>
-
-          <div class="row" style="margin-bottom:12px">
-            <div class="field">
-              <label>Destination</label>
-              <input id="destination" placeholder="e.g., South Korea" />
-            </div>
-            <div class="field">
-              <label>Dates</label>
-              <input id="dates" placeholder="e.g., 3–14 May 2026" />
-            </div>
-            <div class="field">
-              <label>Home base</label>
-              <input id="homebase" placeholder="e.g., Seoul" />
-            </div>
-          </div>
-
-          <div class="kpiRow">
-            <div class="kpi">
-              <div class="label">Days planned</div>
-              <div class="value" id="kpiDays">0</div>
-              <div class="small">Based on itinerary rows</div>
-            </div>
-            <div class="kpi">
-              <div class="label">Budget (total)</div>
-              <div class="value" id="kpiBudget">$0</div>
-              <div class="small">Sum of budget items</div>
-            </div>
-            <div class="kpi">
-              <div class="label">Owed / settled</div>
-              <div class="value" id="kpiSplit">$0 / $0</div>
-              <div class="small">Total owed vs paid</div>
-            </div>
-          </div>
-
-          <div class="hr"></div>
-
-          <h2>People</h2>
-          <div class="people" id="people"></div>
-
-          <div class="hr"></div>
-
-          <h2>Notes</h2>
-          <textarea id="notes" placeholder="Drop links, flight numbers, address, anything…"></textarea>
-
+    <main class="main">
+      <div class="topbar">
+        <div class="chip">
+          <strong id="tripLine">South Korea</strong>
+          <span class="muted" id="dateLine"></span>
         </div>
-
-        <div class="card">
-          <h2>Quick add</h2>
-          <div class="muted" style="font-size:13px;margin-bottom:10px">
-            Add anything fast — it’ll sort into the right place later.
-          </div>
-
-          <div class="row">
-            <div class="field">
-              <label>Type</label>
-              <select id="qaType">
-                <option value="itinerary">Itinerary item</option>
-                <option value="budget">Budget item</option>
-                <option value="decision">Decision</option>
-                <option value="packing">Packing item</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Who (optional)</label>
-              <select id="qaWho"></select>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="field">
-              <label>Title</label>
-              <input id="qaTitle" placeholder="e.g., Book DMZ tour" />
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="field">
-              <label>Details</label>
-              <input id="qaDetails" placeholder="Time, link, price, location…" />
-            </div>
-          </div>
-
-          <div class="row">
-            <button class="btn primary" id="qaAdd">Add</button>
-            <button class="btn" id="qaClear">Clear</button>
-          </div>
-
-          <div class="hr"></div>
-
-          <h2>How to share</h2>
-          <div class="muted" style="font-size:13px;line-height:1.55">
-            This page is “local-first”: each person’s browser has its own copy.<br>
-            Use <b>Export</b> to send the JSON to your friends, and <b>Import</b> to merge.
-          </div>
-
-          <div class="hr"></div>
-
-          <div class="smallmono" id="saveInfo"></div>
+        <div class="row">
+          <button class="btn ghost" id="btnExport">Export</button>
+          <button class="btn ghost" id="btnImport">Import</button>
+          <button class="btn primary" id="btnQuickAdd">Quick add</button>
         </div>
       </div>
-    </section>
 
-    <!-- ITINERARY -->
-    <section class="section" id="itinerary">
-      <div class="card">
-        <div class="row" style="justify-content:space-between">
-          <h2 style="margin:0">Itinerary</h2>
-          <div class="row">
-            <button class="btn" id="addItin">Add row</button>
-            <button class="btn" id="clearItin">Clear</button>
-          </div>
-        </div>
-        <div class="muted" style="font-size:13px;margin:8px 0 12px">
-          Tip: keep it simple — date, time, place, and the vibe.
-        </div>
-
-        <div style="overflow:auto">
-          <table id="itinTable">
-            <thead>
-              <tr>
-                <th style="min-width:120px">Date</th>
-                <th style="min-width:90px">Time</th>
-                <th style="min-width:220px">Plan</th>
-                <th style="min-width:180px">Location / Link</th>
-                <th style="min-width:120px">Owner</th>
-                <th style="min-width:120px">Status</th>
-                <th style="min-width:70px"></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- BUDGET -->
-    <section class="section" id="budget">
-      <div class="card">
-        <div class="row" style="justify-content:space-between">
-          <h2 style="margin:0">Budget & split</h2>
-          <div class="row">
-            <button class="btn" id="addBudget">Add item</button>
-            <button class="btn" id="clearBudget">Clear</button>
-          </div>
-        </div>
-
-        <div class="muted" style="font-size:13px;margin:8px 0 12px">
-          Track costs + who paid. It’ll calculate the split evenly across 6 people (editable later).
-        </div>
-
-        <div style="overflow:auto">
-          <table id="budgetTable">
-            <thead>
-              <tr>
-                <th style="min-width:170px">Item</th>
-                <th style="min-width:110px">Category</th>
-                <th style="min-width:100px">Cost</th>
-                <th style="min-width:130px">Paid by</th>
-                <th style="min-width:130px">Split</th>
-                <th style="min-width:120px">Status</th>
-                <th style="min-width:70px"></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-
-        <div class="hr"></div>
-        <div class="kpiRow">
-          <div class="kpi">
-            <div class="label">Total spend</div>
-            <div class="value" id="budTotal">$0</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Per-person (even split)</div>
-            <div class="value" id="budPer">$0</div>
-          </div>
-          <div class="kpi">
-            <div class="label">Items paid</div>
-            <div class="value" id="budPaid">0</div>
-            <div class="small">Out of <span id="budCount">0</span></div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- DECISIONS -->
-    <section class="section" id="decisions">
-      <div class="card">
-        <div class="row" style="justify-content:space-between">
-          <h2 style="margin:0">Decisions</h2>
-          <div class="row">
-            <button class="btn" id="addDecision">Add</button>
-            <button class="btn" id="clearDecision">Clear</button>
-          </div>
-        </div>
-        <div class="muted" style="font-size:13px;margin:8px 0 12px">
-          Keep a list of open questions: where to stay, day trips, restaurants, etc.
-        </div>
-
-        <div style="overflow:auto">
-          <table id="decTable">
-            <thead>
-              <tr>
-                <th style="min-width:240px">Decision</th>
-                <th style="min-width:220px">Options / Notes</th>
-                <th style="min-width:130px">Owner</th>
-                <th style="min-width:140px">Priority</th>
-                <th style="min-width:90px"></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- PACKING -->
-    <section class="section" id="packing">
-      <div class="card">
-        <div class="row" style="justify-content:space-between">
-          <h2 style="margin:0">Packing</h2>
-          <div class="row">
-            <button class="btn" id="addPack">Add</button>
-            <button class="btn" id="clearPack">Clear</button>
-          </div>
-        </div>
-
-        <div class="muted" style="font-size:13px;margin:8px 0 12px">
-          Shared checklist: group essentials + personal reminders.
-        </div>
-
-        <div style="overflow:auto">
-          <table id="packTable">
-            <thead>
-              <tr>
-                <th style="min-width:220px">Item</th>
-                <th style="min-width:140px">Type</th>
-                <th style="min-width:140px">Owner</th>
-                <th style="min-width:140px">Status</th>
-                <th style="min-width:90px"></th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-
-      </div>
-    </section>
-
-    <div class="footer">Built for Henry, Cordelia, Jesse, Oliver, Mikaela, and Amy · works offline · export/import for sharing</div>
+      <div id="view"></div>
+    </main>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="sheet">
+      <div class="hd">
+        <div>
+          <div style="font-weight:800" id="modalTitle">Quick add</div>
+          <div class="muted" style="font-size:12px" id="modalSub">Add something to the plan</div>
+        </div>
+        <button class="x" id="modalClose">✕</button>
+      </div>
+      <div class="bd" id="modalBody"></div>
+    </div>
+  </div>
 
   <input type="file" id="fileInput" accept="application/json" style="display:none" />
 
   <script>
-    // --- Local-first store ---
-    const PEOPLE = ["Henry","Cordelia","Jesse","Oliver","Mikaela","Amy"];
-    const STORAGE_KEY = "churros_take_sk_v1";
+  dayjs.extend(dayjs_plugin_relativeTime);
 
-    const $ = (q)=>document.querySelector(q);
-    const $$ = (q)=>Array.from(document.querySelectorAll(q));
+  // ---------------------------
+  // State + persistence
+  // ---------------------------
+  const STORAGE_KEY = "churros_take_south_korea__v1";
+  const savePill = document.getElementById("saveStatus");
 
-    function nowISO(){ return new Date().toISOString(); }
-    function money(n){
-      const v = Number(n||0);
-      return v.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});
+  function deepClone(x) {
+    return JSON.parse(JSON.stringify(x));
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return deepClone(window.__INITIAL_DATA__);
+      return Object.assign(deepClone(window.__INITIAL_DATA__), JSON.parse(raw));
+    } catch (e) {
+      console.warn("Load failed, using initial data", e);
+      return deepClone(window.__INITIAL_DATA__);
     }
-    function toast(msg){
-      const t = $("#toast");
-      t.textContent = msg;
-      t.classList.add("show");
-      setTimeout(()=>t.classList.remove("show"), 1600);
-    }
+  }
 
-    const defaultData = {
-      meta: { title: "Churros take South Korea", created: nowISO(), updated: nowISO() },
-      overview: { destination: "South Korea", dates: "", homebase: "", notes: "" },
-      itinerary: [],
-      budget: [],
-      decisions: [],
-      packing: []
-    };
+  let state = loadState();
 
-    function load(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : structuredClone(defaultData);
-      }catch(e){
-        return structuredClone(defaultData);
+  let saveTimer = null;
+  function markDirty() {
+    savePill.textContent = "Saving…";
+    savePill.style.borderColor = "rgba(255,183,3,.35)";
+    savePill.style.background = "rgba(255,183,3,.10)";
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      savePill.textContent = "Saved";
+      savePill.style.borderColor = "rgba(34,197,94,.30)";
+      savePill.style.background = "rgba(34,197,94,.10)";
+    }, 180);
+  }
+
+  // ---------------------------
+  // Helpers
+  // ---------------------------
+  const fmtAUD = (n) => new Intl.NumberFormat(undefined, { style:"currency", currency:"AUD" }).format(Number(n || 0));
+  const fmt = (n) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(Number(n || 0));
+  const fmt2 = (n) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(Number(n || 0));
+
+  function esc(s) {
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;");
+  }
+
+  function uid() {
+    return Math.random().toString(16).slice(2) + Date.now().toString(16);
+  }
+
+  function ensureItineraryShape() {
+    if (!state.itinerary.items) state.itinerary.items = {};
+    for (const d of state.itinerary.days) {
+      if (!state.itinerary.items[d]) state.itinerary.items[d] = {};
+      for (const sec of state.itinerary.sections) {
+        if (!state.itinerary.items[d][sec]) state.itinerary.items[d][sec] = [];
       }
     }
-    function save(){
-      data.meta.updated = nowISO();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      $("#saveInfo").textContent = `Last saved: ${new Date(data.meta.updated).toLocaleString()}`;
-      recalcKPIs();
+  }
+  ensureItineraryShape();
+
+  function tripRangeLabel() {
+    const s = dayjs(state.trip.startDate).format("D MMM YYYY");
+    const e = dayjs(state.trip.endDate).format("D MMM YYYY");
+    return `${s} → ${e}`;
+  }
+
+  function countdownLabel() {
+    const now = dayjs();
+    const start = dayjs(state.trip.startDate);
+    if (now.isAfter(start, "day")) {
+      return "Trip is in progress / past";
     }
+    const days = start.startOf("day").diff(now.startOf("day"), "day");
+    return `${days} day${days===1?"":"s"} to go`;
+  }
 
-    function uid(){ return Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2); }
+  function totalBudgetActual() {
+    return state.budget.categories.reduce((a,c)=>a+Number(c.actual||0),0);
+  }
+  function totalBudgetEstimated() {
+    return state.budget.categories.reduce((a,c)=>a+Number(c.estimated||0),0);
+  }
 
-    // --- UI wiring ---
-    let data = load();
+  function travellers() {
+    return state.trip.travellers || [];
+  }
 
-    function initPeople(){
-      const wrap = $("#people");
-      wrap.innerHTML = "";
-      PEOPLE.forEach(p=>{
-        const el = document.createElement("div");
-        el.className = "avatar";
-        el.innerHTML = `<span class="bubble">${p.slice(0,1).toUpperCase()}</span><span>${p}</span>`;
-        wrap.appendChild(el);
+  // Split balances (positive = owed to person)
+  function computeBalances() {
+    const people = travellers();
+    const balances = Object.fromEntries(people.map(p=>[p,0]));
+    for (const ex of state.budget.expenses) {
+      const aud = Number(ex.aud || 0);
+      if (!aud || aud === 0) continue;
+      const paidBy = ex.paidBy || "";
+      const splitN = people.length || 1;
+      const share = aud / splitN;
+      for (const p of people) balances[p] -= share;
+      if (paidBy && balances[paidBy] != null) balances[paidBy] += aud;
+    }
+    // Round to cents for stability
+    for (const p of Object.keys(balances)) balances[p] = Math.round(balances[p]*100)/100;
+    return balances;
+  }
+
+  // ---------------------------
+  // Modal
+  // ---------------------------
+  const modal = document.getElementById("modal");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalSub = document.getElementById("modalSub");
+  const modalBody = document.getElementById("modalBody");
+  document.getElementById("modalClose").onclick = () => closeModal();
+  modal.addEventListener("click", (e)=>{ if (e.target === modal) closeModal(); });
+
+  function openModal({title, sub, bodyHtml}) {
+    modalTitle.textContent = title;
+    modalSub.textContent = sub || "";
+    modalBody.innerHTML = bodyHtml;
+    modal.classList.add("open");
+  }
+  function closeModal() {
+    modal.classList.remove("open");
+    modalBody.innerHTML = "";
+  }
+
+  // ---------------------------
+  // Navigation + Routing
+  // ---------------------------
+  const PAGES = [
+    { id: "overview", label: "Overview", pill: () => countdownLabel() },
+    { id: "itinerary", label: "Itinerary", pill: () => `${state.itinerary.days.length} days` },
+    { id: "budget", label: "Budget", pill: () => fmtAUD(totalBudgetActual()) },
+    { id: "attractions", label: "Attractions", pill: () => `${state.attractions.length} spots` },
+    { id: "packing", label: "Packing", pill: () => `${travellers().length} people` },
+    { id: "ideas", label: "Polls & Ideas", pill: () => `${state.polls.length} polls` },
+    { id: "settings", label: "Settings", pill: () => "Import/Export" },
+  ];
+
+  const navEl = document.getElementById("nav");
+  const viewEl = document.getElementById("view");
+
+  function setHash(id) {
+    location.hash = "#" + id;
+  }
+
+  function currentPage() {
+    const h = (location.hash || "#overview").replace("#","");
+    return PAGES.find(p=>p.id===h) ? h : "overview";
+  }
+
+  function renderNav() {
+    navEl.innerHTML = PAGES.map(p=>{
+      const active = (p.id === currentPage()) ? "active" : "";
+      return `
+        <button class="${active}" data-page="${p.id}">
+          <div class="left">
+            <span>${esc(p.label)}</span>
+          </div>
+          <span class="pill">${esc(p.pill())}</span>
+        </button>
+      `;
+    }).join("");
+
+    for (const btn of navEl.querySelectorAll("button")) {
+      btn.onclick = () => setHash(btn.dataset.page);
+    }
+  }
+
+  // ---------------------------
+  // Render: Overview
+  // ---------------------------
+  function renderOverview() {
+    const people = travellers();
+    const start = dayjs(state.trip.startDate);
+    const end = dayjs(state.trip.endDate);
+    const durDays = end.diff(start, "day") + 1;
+    const budgetA = totalBudgetActual();
+    const budgetE = totalBudgetEstimated();
+    const perPerson = people.length ? budgetA / people.length : 0;
+
+    const done = state.todos.filter(t=>t.done).length;
+    const total = state.todos.length;
+    const pct = total ? Math.round(done/total*100) : 0;
+
+    const recentExpenses = [...state.budget.expenses]
+      .filter(e => Number(e.aud||0) > 0)
+      .slice(0,5);
+
+    return `
+      <div class="grid">
+        <section class="card">
+          <div class="hd">
+            <h2>Trip heartbeat</h2>
+            <div class="row">
+              <button class="btn ghost" id="btnEditTrip">Edit trip</button>
+              <button class="btn primary" id="btnAddTodo">Add task</button>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="kpi">
+              <div class="box">
+                <div class="label">Countdown</div>
+                <div class="value mono">${esc(countdownLabel())}</div>
+              </div>
+              <div class="box">
+                <div class="label">Dates</div>
+                <div class="value mono">${esc(tripRangeLabel())}</div>
+              </div>
+              <div class="box">
+                <div class="label">Crew</div>
+                <div class="value mono">${people.length} people</div>
+              </div>
+            </div>
+
+            <div style="height:14px"></div>
+
+            <div class="split">
+              <div>
+                <div class="muted" style="font-size:12px; font-weight:650;">To-do progress</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                  <div><strong>${done}</strong> / ${total} tasks done</div>
+                  <div class="pill">${pct}%</div>
+                </div>
+                <div class="bar" style="margin-top:8px"><div style="width:${pct}%"></div></div>
+
+                <div class="hint">
+                  Tip: This site is <strong>local-first</strong>. Everyone can export a JSON and post it in chat to keep in sync.
+                </div>
+              </div>
+
+              <div>
+                <div class="muted" style="font-size:12px; font-weight:650;">Budget snapshot</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                  <div><strong>${fmtAUD(budgetA)}</strong> spent</div>
+                  <div class="pill">Est. ${fmtAUD(budgetE)}</div>
+                </div>
+                <div class="hint">
+                  Current split: <strong>${fmtAUD(perPerson)}</strong> per person (even split, adjustable in Budget).
+                </div>
+              </div>
+            </div>
+
+            <div style="height:14px"></div>
+
+            <div class="row">
+              ${
+                people.map(p=>`<span class="tag">👤 ${esc(p)}</span>`).join("")
+              }
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="hd">
+            <h2>Today’s focus</h2>
+            <button class="btn ghost" id="btnQuickExpense">Log expense</button>
+          </div>
+          <div class="bd">
+            <div class="list" id="todoList">
+              ${
+                state.todos.map((t,idx)=>`
+                  <div class="todo">
+                    <input type="checkbox" data-i="${idx}" ${t.done ? "checked":""} />
+                    <div>
+                      <div class="title">${esc(t.title)}</div>
+                      <div class="meta">Owner: <strong>${esc(t.owner||"—")}</strong> • Due: <span class="mono">${esc(t.due||"—")}</span></div>
+                    </div>
+                    <button class="miniBtn" data-del="${idx}">Delete</button>
+                  </div>
+                `).join("")
+              }
+            </div>
+
+            <div style="height:14px"></div>
+
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:8px;">Recent expenses</div>
+            <table class="table">
+              <thead><tr><th>What</th><th>Paid by</th><th style="text-align:right;">AUD</th></tr></thead>
+              <tbody>
+                ${
+                  recentExpenses.length ? recentExpenses.map(e=>`
+                    <tr>
+                      <td><strong>${esc(e.category)}</strong><div class="muted" style="font-size:12px">${esc(e.description||"")}</div></td>
+                      <td>${esc(e.paidBy||"—")}</td>
+                      <td style="text-align:right;" class="mono">${fmtAUD(e.aud)}</td>
+                    </tr>
+                  `).join("") : `<tr><td colspan="3" class="muted">No expenses yet. Flex on 'em by logging the first ₩.</td></tr>`
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  function bindOverview() {
+    // Todo toggles
+    document.querySelectorAll('#todoList input[type="checkbox"]').forEach(cb=>{
+      cb.onchange = () => {
+        const i = Number(cb.dataset.i);
+        state.todos[i].done = cb.checked;
+        markDirty();
+        rerender();
+      };
+    });
+    document.querySelectorAll('#todoList [data-del]').forEach(btn=>{
+      btn.onclick = () => {
+        const i = Number(btn.dataset.del);
+        state.todos.splice(i,1);
+        markDirty();
+        rerender();
+      };
+    });
+
+    document.getElementById("btnAddTodo").onclick = () => openTodoModal();
+    document.getElementById("btnEditTrip").onclick = () => openTripModal();
+    document.getElementById("btnQuickExpense").onclick = () => openExpenseModal({goToBudget:false});
+  }
+
+  // ---------------------------
+  // Render: Itinerary
+  // ---------------------------
+  let selectedDay = state.itinerary.days[0] || dayjs().format("YYYY-MM-DD");
+
+  function dayLabel(d) {
+    const dd = dayjs(d);
+    return `${dd.format("ddd D MMM")}`;
+  }
+
+  function renderItinerary() {
+    ensureItineraryShape();
+    if (!state.itinerary.days.includes(selectedDay)) {
+      selectedDay = state.itinerary.days[0] || selectedDay;
+    }
+    const dayButtons = state.itinerary.days.map(d=>{
+      const active = (d===selectedDay) ? "active" : "";
+      const entries = Object.values(state.itinerary.items[d]||{}).reduce((a,arr)=>a+(arr?.length||0),0);
+      return `
+        <div class="dayBtn ${active}" data-day="${d}">
+          <div class="d1">${esc(dayLabel(d))}</div>
+          <div class="d2">${entries} item${entries===1?"":"s"}</div>
+        </div>
+      `;
+    }).join("");
+
+    const secHtml = state.itinerary.sections.map(sec=>{
+      const items = state.itinerary.items[selectedDay][sec] || [];
+      return `
+        <div class="sectionBox">
+          <div class="shd">
+            <strong>${esc(sec)}</strong>
+            <button class="miniBtn" data-add-it="${esc(sec)}">Add</button>
+          </div>
+          <div class="sbd">
+            ${
+              items.length ? items.map((it,idx)=>`
+                <div class="note">
+                  <div>
+                    <div class="t">${esc(it.text)}</div>
+                    <div class="small">${esc(it.owner ? "👤 " + it.owner : " ")}${esc(it.time ? " • ⏰ " + it.time : "")}${esc(it.place ? " • 📍 " + it.place : "")}</div>
+                  </div>
+                  <div class="actions">
+                    <button class="miniBtn" data-edit-it="${sec}" data-idx="${idx}">Edit</button>
+                    <button class="miniBtn" data-del-it="${sec}" data-idx="${idx}">Del</button>
+                  </div>
+                </div>
+              `).join("") : `<div class="muted">Nothing here yet. Tap <span class="kbd">Add</span> to start building the day.</div>`
+            }
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <div class="itGrid">
+        <section class="card">
+          <div class="hd">
+            <h2>Days</h2>
+            <div class="row">
+              <button class="btn ghost" id="btnAddDay">Add day</button>
+              <button class="btn primary" id="btnAddBig">Add item</button>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="dayList" id="dayList">${dayButtons}</div>
+            <div class="hint">Pro move: keep <strong>Main events</strong> short, put details in <strong>Notes</strong>.</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="hd">
+            <h2>Plan for <span class="mono">${esc(selectedDay)}</span></h2>
+            <div class="row">
+              <button class="btn ghost" id="btnCopyDay">Copy from previous</button>
+              <button class="btn ghost" id="btnClearDay">Clear day</button>
+            </div>
+          </div>
+          <div class="bd" style="display:grid; gap:12px;">
+            ${secHtml}
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  function bindItinerary() {
+    document.querySelectorAll("#dayList .dayBtn").forEach(el=>{
+      el.onclick = () => {
+        selectedDay = el.dataset.day;
+        rerender();
+      };
+    });
+
+    document.getElementById("btnAddBig").onclick = () => openItineraryItemModal({day:selectedDay});
+    document.getElementById("btnAddDay").onclick = () => openAddDayModal();
+
+    document.querySelectorAll("[data-add-it]").forEach(btn=>{
+      btn.onclick = () => openItineraryItemModal({day:selectedDay, section: btn.dataset.addIt});
+    });
+    document.querySelectorAll("[data-del-it]").forEach(btn=>{
+      btn.onclick = () => {
+        const sec = btn.dataset.delIt;
+        const idx = Number(btn.dataset.idx);
+        state.itinerary.items[selectedDay][sec].splice(idx,1);
+        markDirty(); rerender();
+      };
+    });
+    document.querySelectorAll("[data-edit-it]").forEach(btn=>{
+      btn.onclick = () => {
+        const sec = btn.dataset.editIt;
+        const idx = Number(btn.dataset.idx);
+        openItineraryItemModal({day:selectedDay, section: sec, idx});
+      };
+    });
+
+    document.getElementById("btnClearDay").onclick = () => {
+      if (!confirm("Clear all sections for this day?")) return;
+      for (const sec of state.itinerary.sections) state.itinerary.items[selectedDay][sec] = [];
+      markDirty(); rerender();
+    };
+
+    document.getElementById("btnCopyDay").onclick = () => {
+      const i = state.itinerary.days.indexOf(selectedDay);
+      if (i <= 0) return alert("No previous day to copy from.");
+      const prev = state.itinerary.days[i-1];
+      state.itinerary.items[selectedDay] = deepClone(state.itinerary.items[prev]);
+      markDirty(); rerender();
+    };
+  }
+
+  // ---------------------------
+  // Render: Budget
+  // ---------------------------
+  let budgetChart = null;
+
+  function renderBudget() {
+    const people = travellers();
+    const balances = computeBalances();
+    const exCount = state.budget.expenses.length;
+
+    return `
+      <div class="grid">
+        <section class="card">
+          <div class="hd">
+            <h2>Budget overview</h2>
+            <div class="row">
+              <button class="btn ghost" id="btnAddCat">Add category</button>
+              <button class="btn primary" id="btnAddExpense">Add expense</button>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="split">
+              <div>
+                <canvas id="budgetChart" height="160"></canvas>
+                <div class="hint">Chart shows <strong>actual spend</strong> by category. Categories with $0 hide themselves.</div>
+              </div>
+              <div>
+                <div class="kpi">
+                  <div class="box">
+                    <div class="label">Estimated total</div>
+                    <div class="value mono">${fmtAUD(totalBudgetEstimated())}</div>
+                  </div>
+                  <div class="box">
+                    <div class="label">Actual total</div>
+                    <div class="value mono">${fmtAUD(totalBudgetActual())}</div>
+                  </div>
+                  <div class="box">
+                    <div class="label">Per person (even split)</div>
+                    <div class="value mono">${fmtAUD(people.length ? totalBudgetActual()/people.length : 0)}</div>
+                  </div>
+                </div>
+
+                <div style="height:12px"></div>
+
+                <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:8px;">Who’s up / down</div>
+                <table class="table">
+                  <thead><tr><th>Person</th><th style="text-align:right;">Balance</th></tr></thead>
+                  <tbody>
+                    ${
+                      people.map(p=>{
+                        const b = balances[p] || 0;
+                        const sign = b >= 0 ? "+" : "−";
+                        return `
+                          <tr>
+                            <td><strong>${esc(p)}</strong></td>
+                            <td style="text-align:right;" class="mono">${sign}${fmtAUD(Math.abs(b))}</td>
+                          </tr>
+                        `;
+                      }).join("")
+                    }
+                  </tbody>
+                </table>
+
+                <div class="hint">
+                  Balance = how much the group owes that person (positive), or how much they owe the group (negative).
+                  This assumes an <strong>even split across all travellers</strong>.
+                </div>
+              </div>
+            </div>
+
+            <div style="height:14px"></div>
+
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:8px;">Categories</div>
+            <table class="table" id="catTable">
+              <thead><tr>
+                <th>Category</th>
+                <th style="text-align:right;">Estimated (AUD)</th>
+                <th style="text-align:right;">Actual (AUD)</th>
+                <th style="text-align:right;">Per person</th>
+                <th></th>
+              </tr></thead>
+              <tbody>
+                ${
+                  state.budget.categories.map((c,idx)=>{
+                    const pp = people.length ? Number(c.actual||0)/people.length : 0;
+                    return `
+                      <tr>
+                        <td>
+                          <strong>${esc(c.category)}</strong>
+                        </td>
+                        <td style="text-align:right;"><input class="input mono" data-cat-est="${idx}" value="${esc(fmt2(c.estimated))}" /></td>
+                        <td style="text-align:right;"><input class="input mono" data-cat-act="${idx}" value="${esc(fmt2(c.actual))}" /></td>
+                        <td style="text-align:right;" class="mono">${fmtAUD(pp)}</td>
+                        <td style="text-align:right;"><button class="miniBtn" data-del-cat="${idx}">Del</button></td>
+                      </tr>
+                    `;
+                  }).join("")
+                }
+              </tbody>
+            </table>
+
+            <div style="height:14px"></div>
+
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:8px;">Expenses tracker</div>
+            <table class="table" id="expTable">
+              <thead><tr>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Paid by</th>
+                <th style="text-align:right;">AUD</th>
+                <th>Paid?</th>
+                <th></th>
+              </tr></thead>
+              <tbody>
+                ${
+                  state.budget.expenses.slice(0,50).map((e,idx)=>`
+                    <tr>
+                      <td>${esc(e.category)}</td>
+                      <td>${esc(e.description||"")}</td>
+                      <td>${esc(e.paidBy||"—")}</td>
+                      <td style="text-align:right;" class="mono">${fmtAUD(e.aud)}</td>
+                      <td>${e.paid ? "✅" : "—"}</td>
+                      <td style="text-align:right;"><button class="miniBtn" data-del-exp="${idx}">Del</button></td>
+                    </tr>
+                  `).join("")
+                }
+              </tbody>
+            </table>
+            <div class="hint">Showing first 50 rows. Use <span class="kbd">Add expense</span> to log more. Export to share updates.</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="hd">
+            <h2>Settle up</h2>
+            <button class="btn ghost" id="btnSuggestSettle">Suggest transfers</button>
+          </div>
+          <div class="bd">
+            <div id="settleBox" class="muted">
+              Click <strong>Suggest transfers</strong> to generate a simple “who pays who” list (even split).
+            </div>
+
+            <div style="height:12px"></div>
+
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:8px;">Pro tips</div>
+            <div class="hint">
+              • Keep descriptions short so it’s readable on mobile.<br/>
+              • If someone didn’t join an activity, duplicate the expense and change the split logic later (or just note it).<br/>
+              • If you want a true multi-split engine (per-expense participants), tell me and I’ll upgrade it.
+            </div>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  function bindBudget() {
+    // category edits
+    document.querySelectorAll("[data-cat-est]").forEach(inp=>{
+      inp.onchange = () => {
+        const i = Number(inp.dataset.catEst);
+        state.budget.categories[i].estimated = Number(inp.value || 0);
+        markDirty(); rerender();
+      };
+    });
+    document.querySelectorAll("[data-cat-act]").forEach(inp=>{
+      inp.onchange = () => {
+        const i = Number(inp.dataset.catAct);
+        state.budget.categories[i].actual = Number(inp.value || 0);
+        markDirty(); rerender();
+      };
+    });
+    document.querySelectorAll("[data-del-cat]").forEach(btn=>{
+      btn.onclick = () => {
+        const i = Number(btn.dataset.delCat);
+        state.budget.categories.splice(i,1);
+        markDirty(); rerender();
+      };
+    });
+    document.querySelectorAll("[data-del-exp]").forEach(btn=>{
+      btn.onclick = () => {
+        const i = Number(btn.dataset.delExp);
+        state.budget.expenses.splice(i,1);
+        markDirty(); rerender();
+      };
+    });
+
+    document.getElementById("btnAddExpense").onclick = () => openExpenseModal({goToBudget:true});
+    document.getElementById("btnAddCat").onclick = () => openCategoryModal();
+    document.getElementById("btnSuggestSettle").onclick = () => {
+      const transfers = suggestTransfers();
+      const box = document.getElementById("settleBox");
+      if (!transfers.length) {
+        box.innerHTML = "<strong>All square.</strong> Nobody owes anyone anything (within rounding).";
+        return;
+      }
+      box.innerHTML = `
+        <div class="list">
+          ${
+            transfers.map(t=>`
+              <div class="todo" style="grid-template-columns: 1fr auto;">
+                <div>
+                  <div class="title">💸 ${esc(t.from)} → ${esc(t.to)}</div>
+                  <div class="meta mono">${fmtAUD(t.amount)}</div>
+                </div>
+                <button class="miniBtn" data-copy="${esc(`${t.from} pays ${t.to} ${fmt2(t.amount)} AUD`)}">Copy</button>
+              </div>
+            `).join("")
+          }
+        </div>
+        <div class="hint">Copy/paste to your group chat. Rounds to cents.</div>
+      `;
+      box.querySelectorAll("[data-copy]").forEach(btn=>{
+        btn.onclick = async () => {
+          try {
+            await navigator.clipboard.writeText(btn.dataset.copy);
+            btn.textContent = "Copied!";
+            setTimeout(()=>btn.textContent="Copy", 900);
+          } catch(e) {
+            alert("Copy failed (browser permissions).");
+          }
+        };
       });
+    };
 
-      const who = $("#qaWho");
-      who.innerHTML = `<option value="">—</option>` + PEOPLE.map(p=>`<option value="${p}">${p}</option>`).join("");
-    }
-
-    function initOverview(){
-      $("#destination").value = data.overview.destination || "";
-      $("#dates").value = data.overview.dates || "";
-      $("#homebase").value = data.overview.homebase || "";
-      $("#notes").value = data.overview.notes || "";
-
-      ["destination","dates","homebase","notes"].forEach(id=>{
-        $("#"+id).addEventListener("input", ()=>{
-          data.overview[id] = $("#"+id).value;
-          save();
-        });
-      });
-      $("#saveInfo").textContent = data.meta.updated ? `Last saved: ${new Date(data.meta.updated).toLocaleString()}` : "";
-    }
-
-    function tabInit(){
-      $$(".tab").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          $$(".tab").forEach(b=>b.classList.remove("active"));
-          btn.classList.add("active");
-          const t = btn.dataset.tab;
-          $$(".section").forEach(s=>s.classList.remove("active"));
-          $("#"+t).classList.add("active");
-          // lazy refresh
-          renderAll();
-          window.scrollTo({top:0,behavior:"smooth"});
-        });
-      });
-    }
-
-    // --- Rendering helpers ---
-    function statusTag(status){
-      const map = {
-        "planned": ["Planned","warn"],
-        "booked": ["Booked","good"],
-        "done": ["Done","good"],
-        "idea": ["Idea","warn"],
-        "open": ["Open","warn"],
-        "decided": ["Decided","good"],
-        "packed": ["Packed","good"],
-        "need": ["Need","warn"],
-        "paid": ["Paid","good"],
-        "unpaid": ["Unpaid","bad"]
+    // chart
+    const ctx = document.getElementById("budgetChart");
+    if (ctx) {
+      const labels = state.budget.categories.map(c=>c.category);
+      const data = state.budget.categories.map(c=>Number(c.actual||0));
+      const filtered = labels.map((l,i)=>({l, v:data[i]})).filter(x=>x.v>0);
+      const chartData = {
+        labels: filtered.map(x=>x.l),
+        datasets: [{ label: "Actual (AUD)", data: filtered.map(x=>x.v) }]
       };
-      const [label,cls] = map[status] || [status||"—","warn"];
-      return `<span class="tag"><span class="s ${cls}"></span>${label}</span>`;
-    }
-    function personSelect(value){
-      return `<select data-k="owner">
-        <option value="">—</option>
-        ${PEOPLE.map(p=>`<option value="${p}" ${p===value?"selected":""}>${p}</option>`).join("")}
-      </select>`;
-    }
-
-    // --- Itinerary ---
-    function renderItinerary(){
-      const tb = $("#itinTable tbody");
-      tb.innerHTML = "";
-      data.itinerary.forEach(row=>{
-        const tr = document.createElement("tr");
-        tr.dataset.id = row.id;
-        tr.innerHTML = `
-          <td><input data-k="date" value="${escapeHTML(row.date||"")}" placeholder="YYYY-MM-DD or text"></td>
-          <td><input data-k="time" value="${escapeHTML(row.time||"")}" placeholder="e.g., 10:30"></td>
-          <td><input data-k="plan" value="${escapeHTML(row.plan||"")}" placeholder="What are we doing?"></td>
-          <td><input data-k="where" value="${escapeHTML(row.where||"")}" placeholder="Address / link"></td>
-          <td>${personSelect(row.owner||"")}</td>
-          <td>
-            <select data-k="status">
-              ${opt(["planned","booked","done"], row.status)}
-            </select>
-          </td>
-          <td><button class="btn" data-del="1">Delete</button></td>
-        `;
-        tb.appendChild(tr);
-      });
-
-      tb.oninput = (e)=>{
-        const tr = e.target.closest("tr");
-        if(!tr) return;
-        const id = tr.dataset.id;
-        const k = e.target.dataset.k;
-        if(!k) return;
-        const r = data.itinerary.find(x=>x.id===id);
-        r[k] = e.target.value;
-        save();
-      };
-      tb.onclick = (e)=>{
-        const del = e.target.closest("[data-del]");
-        if(!del) return;
-        const tr = e.target.closest("tr");
-        data.itinerary = data.itinerary.filter(x=>x.id!==tr.dataset.id);
-        save(); renderItinerary(); toast("Deleted");
-      };
-    }
-
-    // --- Budget ---
-    function renderBudget(){
-      const tb = $("#budgetTable tbody");
-      tb.innerHTML = "";
-      data.budget.forEach(row=>{
-        const tr = document.createElement("tr");
-        tr.dataset.id = row.id;
-        tr.innerHTML = `
-          <td><input data-k="item" value="${escapeHTML(row.item||"")}" placeholder="e.g., Accommodation"></td>
-          <td><input data-k="category" value="${escapeHTML(row.category||"")}" placeholder="e.g., Stay"></td>
-          <td><input data-k="cost" type="number" min="0" step="1" value="${escapeHTML(row.cost||0)}"></td>
-          <td>${personSelect(row.paidBy||"")}</td>
-          <td>
-            <select data-k="split">
-              ${opt(["even-6","custom"], row.split||"even-6")}
-            </select>
-          </td>
-          <td>
-            <select data-k="status">
-              ${opt(["unpaid","paid"], row.status||"unpaid")}
-            </select>
-          </td>
-          <td><button class="btn" data-del="1">Delete</button></td>
-        `;
-        // tweak paidBy select
-        tr.querySelector('select[data-k="owner"]').dataset.k = "paidBy";
-        tb.appendChild(tr);
-      });
-
-      tb.oninput = (e)=>{
-        const tr = e.target.closest("tr");
-        if(!tr) return;
-        const id = tr.dataset.id;
-        const k = e.target.dataset.k;
-        if(!k) return;
-        const r = data.budget.find(x=>x.id===id);
-        r[k] = (k==="cost") ? Number(e.target.value||0) : e.target.value;
-        save();
-      };
-      tb.onclick = (e)=>{
-        const del = e.target.closest("[data-del]");
-        if(!del) return;
-        const tr = e.target.closest("tr");
-        data.budget = data.budget.filter(x=>x.id!==tr.dataset.id);
-        save(); renderBudget(); toast("Deleted");
-      };
-    }
-
-    // --- Decisions ---
-    function renderDecisions(){
-      const tb = $("#decTable tbody");
-      tb.innerHTML = "";
-      data.decisions.forEach(row=>{
-        const tr = document.createElement("tr");
-        tr.dataset.id = row.id;
-        tr.innerHTML = `
-          <td><input data-k="decision" value="${escapeHTML(row.decision||"")}" placeholder="What needs deciding?"></td>
-          <td><input data-k="notes" value="${escapeHTML(row.notes||"")}" placeholder="Options / links / pros/cons"></td>
-          <td>${personSelect(row.owner||"")}</td>
-          <td>
-            <select data-k="priority">
-              ${opt(["low","medium","high"], row.priority||"medium")}
-            </select>
-          </td>
-          <td><button class="btn" data-del="1">Delete</button></td>
-        `;
-        tb.appendChild(tr);
-      });
-
-      tb.oninput = (e)=>{
-        const tr = e.target.closest("tr");
-        if(!tr) return;
-        const id = tr.dataset.id;
-        const k = e.target.dataset.k;
-        if(!k) return;
-        const r = data.decisions.find(x=>x.id===id);
-        r[k] = e.target.value;
-        save();
-      };
-      tb.onclick = (e)=>{
-        const del = e.target.closest("[data-del]");
-        if(!del) return;
-        const tr = e.target.closest("tr");
-        data.decisions = data.decisions.filter(x=>x.id!==tr.dataset.id);
-        save(); renderDecisions(); toast("Deleted");
-      };
-    }
-
-    // --- Packing ---
-    function renderPacking(){
-      const tb = $("#packTable tbody");
-      tb.innerHTML = "";
-      data.packing.forEach(row=>{
-        const tr = document.createElement("tr");
-        tr.dataset.id = row.id;
-        tr.innerHTML = `
-          <td><input data-k="item" value="${escapeHTML(row.item||"")}" placeholder="e.g., Universal adapter"></td>
-          <td>
-            <select data-k="type">
-              ${opt(["group","personal"], row.type||"group")}
-            </select>
-          </td>
-          <td>${personSelect(row.owner||"")}</td>
-          <td>
-            <select data-k="status">
-              ${opt(["need","packed"], row.status||"need")}
-            </select>
-          </td>
-          <td><button class="btn" data-del="1">Delete</button></td>
-        `;
-        tb.appendChild(tr);
-      });
-
-      tb.oninput = (e)=>{
-        const tr = e.target.closest("tr");
-        if(!tr) return;
-        const id = tr.dataset.id;
-        const k = e.target.dataset.k;
-        if(!k) return;
-        const r = data.packing.find(x=>x.id===id);
-        r[k] = e.target.value;
-        save();
-      };
-      tb.onclick = (e)=>{
-        const del = e.target.closest("[data-del]");
-        if(!del) return;
-        const tr = e.target.closest("tr");
-        data.packing = data.packing.filter(x=>x.id!==tr.dataset.id);
-        save(); renderPacking(); toast("Deleted");
-      };
-    }
-
-    function opt(options, selected){
-      return options.map(o=>`<option value="${o}" ${o===selected?"selected":""}>${pretty(o)}</option>`).join("");
-    }
-    function pretty(x){
-      return (x||"").toString().replace(/-/g," ").replace(/\b\w/g, m=>m.toUpperCase());
-    }
-    function escapeHTML(s){
-      return String(s??"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
-    }
-
-    // --- KPIs ---
-    function recalcKPIs(){
-      // days planned: number of unique non-empty dates
-      const dates = new Set(data.itinerary.map(r=>r.date).filter(Boolean));
-      $("#kpiDays").textContent = dates.size;
-
-      const total = data.budget.reduce((a,r)=>a+Number(r.cost||0),0);
-      $("#kpiBudget").textContent = money(total);
-
-      const owed = total; // simplistic: total owed by group
-      const paid = data.budget.filter(r=>r.status==="paid").reduce((a,r)=>a+Number(r.cost||0),0);
-      $("#kpiSplit").textContent = `${money(owed)} / ${money(paid)}`;
-
-      $("#budTotal").textContent = money(total);
-      $("#budPer").textContent = money(total / PEOPLE.length);
-      $("#budCount").textContent = data.budget.length;
-      $("#budPaid").textContent = data.budget.filter(r=>r.status==="paid").length;
-    }
-
-    function renderAll(){
-      renderItinerary();
-      renderBudget();
-      renderDecisions();
-      renderPacking();
-      recalcKPIs();
-    }
-
-    // --- Buttons ---
-    function btnInit(){
-      $("#addItin").onclick = ()=>{
-        data.itinerary.push({ id: uid(), date:"", time:"", plan:"", where:"", owner:"", status:"planned" });
-        save(); renderItinerary(); toast("Added itinerary row");
-      };
-      $("#clearItin").onclick = ()=>{
-        if(confirm("Clear ALL itinerary rows?")){ data.itinerary=[]; save(); renderItinerary(); }
-      };
-
-      $("#addBudget").onclick = ()=>{
-        data.budget.push({ id: uid(), item:"", category:"", cost:0, paidBy:"", split:"even-6", status:"unpaid" });
-        save(); renderBudget(); toast("Added budget item");
-      };
-      $("#clearBudget").onclick = ()=>{
-        if(confirm("Clear ALL budget rows?")){ data.budget=[]; save(); renderBudget(); }
-      };
-
-      $("#addDecision").onclick = ()=>{
-        data.decisions.push({ id: uid(), decision:"", notes:"", owner:"", priority:"medium" });
-        save(); renderDecisions(); toast("Added decision");
-      };
-      $("#clearDecision").onclick = ()=>{
-        if(confirm("Clear ALL decisions?")){ data.decisions=[]; save(); renderDecisions(); }
-      };
-
-      $("#addPack").onclick = ()=>{
-        data.packing.push({ id: uid(), item:"", type:"group", owner:"", status:"need" });
-        save(); renderPacking(); toast("Added packing item");
-      };
-      $("#clearPack").onclick = ()=>{
-        if(confirm("Clear ALL packing rows?")){ data.packing=[]; save(); renderPacking(); }
-      };
-
-      $("#qaAdd").onclick = ()=>{
-        const type = $("#qaType").value;
-        const who = $("#qaWho").value;
-        const title = $("#qaTitle").value.trim();
-        const det = $("#qaDetails").value.trim();
-        if(!title){ toast("Add a title first"); return; }
-
-        if(type==="itinerary"){
-          data.itinerary.push({ id: uid(), date:"", time:"", plan:title, where:det, owner:who, status:"planned" });
-        }else if(type==="budget"){
-          // allow user to type "$123" etc in details
-          const num = Number((det||"").replace(/[^0-9.]/g,"")) || 0;
-          data.budget.push({ id: uid(), item:title, category:"", cost:num, paidBy:who, split:"even-6", status:"unpaid" });
-        }else if(type==="decision"){
-          data.decisions.push({ id: uid(), decision:title, notes:det, owner:who, priority:"medium" });
-        }else if(type==="packing"){
-          data.packing.push({ id: uid(), item:title, type:"group", owner:who, status:"need" });
+      if (budgetChart) budgetChart.destroy();
+      budgetChart = new Chart(ctx, {
+        type: "doughnut",
+        data: chartData,
+        options: {
+          plugins: {
+            legend: { position: "bottom" },
+            tooltip: {
+              callbacks: {
+                label: (c) => `${c.label}: ${fmtAUD(c.parsed)}`
+              }
+            }
+          },
+          cutout: "68%"
         }
-        save();
-        renderAll();
-        $("#qaTitle").value=""; $("#qaDetails").value="";
-        toast("Added");
-      };
-      $("#qaClear").onclick = ()=>{
-        $("#qaTitle").value=""; $("#qaDetails").value="";
-        toast("Cleared");
-      };
+      });
+    }
+  }
 
-      $("#btnExport").onclick = ()=>{
-        const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(blob);
-        a.download = "churros-take-south-korea.json";
-        a.click();
-        URL.revokeObjectURL(a.href);
-        toast("Exported JSON");
-      };
+  // Greedy settlement algorithm
+  function suggestTransfers() {
+    const balances = computeBalances(); // + => owed to, - => owes
+    const creditors = [];
+    const debtors = [];
+    for (const [p,b] of Object.entries(balances)) {
+      const v = Math.round(b*100)/100;
+      if (v > 0.01) creditors.push([p,v]);
+      else if (v < -0.01) debtors.push([p,-v]);
+    }
+    creditors.sort((a,b)=>b[1]-a[1]);
+    debtors.sort((a,b)=>b[1]-a[1]);
+    const transfers = [];
+    let i=0,j=0;
+    while (i<debtors.length && j<creditors.length) {
+      const [dp, dv] = debtors[i];
+      const [cp, cv] = creditors[j];
+      const amt = Math.min(dv, cv);
+      transfers.push({from: dp, to: cp, amount: Math.round(amt*100)/100});
+      debtors[i][1] = Math.round((dv-amt)*100)/100;
+      creditors[j][1] = Math.round((cv-amt)*100)/100;
+      if (debtors[i][1] <= 0.01) i++;
+      if (creditors[j][1] <= 0.01) j++;
+    }
+    return transfers;
+  }
 
-      $("#btnImport").onclick = ()=> $("#fileInput").click();
-      $("#fileInput").onchange = async (e)=>{
-        const f = e.target.files?.[0];
-        if(!f) return;
-        try{
-          const txt = await f.text();
-          const incoming = JSON.parse(txt);
-          if(!incoming || !incoming.meta){ throw new Error("Not a valid export file"); }
-          // simple merge: replace everything
-          data = incoming;
-          save();
-          initOverview();
-          renderAll();
-          toast("Imported");
-        }catch(err){
-          alert("Import failed: " + err.message);
-        }finally{
-          $("#fileInput").value = "";
+  // ---------------------------
+  // Render: Attractions
+  // ---------------------------
+  function renderAttractions() {
+    const cities = [...new Set(state.attractions.map(a=>a.city).filter(Boolean))].sort();
+    const cityOpts = ["All", ...cities];
+    const q = state.__ui?.attrQ || "";
+    const city = state.__ui?.attrCity || "All";
+    const onlySaved = !!state.__ui?.attrSaved;
+
+    const filtered = state.attractions.filter(a=>{
+      const matchesQ = !q || (a.name||"").toLowerCase().includes(q.toLowerCase()) || (a.notes||"").toLowerCase().includes(q.toLowerCase());
+      const matchesCity = city==="All" || (a.city||"")===city;
+      const matchesSaved = !onlySaved || !!a.saved;
+      return matchesQ && matchesCity && matchesSaved;
+    });
+
+    return `
+      <section class="card">
+        <div class="hd">
+          <h2>Attractions & spots</h2>
+          <div class="row">
+            <button class="btn ghost" id="btnAddSpot">Add spot</button>
+            <button class="btn primary" id="btnMakeMap">Open Google Maps search</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="split" style="align-items:end">
+            <div>
+              <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Search</div>
+              <input class="input" id="attrQ" placeholder="e.g. palace, tower, markets…" value="${esc(q)}" />
+            </div>
+            <div class="row" style="justify-content:flex-end;">
+              <label class="muted" style="font-size:12px; font-weight:650;">City</label>
+              <select id="attrCity" style="min-width:180px;">
+                ${
+                  cityOpts.map(o=>`<option ${o===city?"selected":""}>${esc(o)}</option>`).join("")
+                }
+              </select>
+              <label class="row" style="gap:8px;">
+                <input type="checkbox" id="attrSaved" ${onlySaved?"checked":""} />
+                <span class="muted" style="font-size:12px; font-weight:650;">Saved only</span>
+              </label>
+            </div>
+          </div>
+
+          <div style="height:14px"></div>
+
+          <div class="cards">
+            ${
+              filtered.length ? filtered.map((a,idx)=>{
+                const mapsQ = encodeURIComponent(`${a.name} ${a.city||""}`);
+                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQ}`;
+                return `
+                  <div class="place">
+                    <div class="row" style="justify-content:space-between; align-items:flex-start;">
+                      <div>
+                        <div class="name">${esc(a.name)}</div>
+                        <div class="mini">${esc([a.city, a.hours].filter(Boolean).join(" • "))}</div>
+                        <div class="mini">${a.feeWon ? "₩ " + fmt(a.feeWon) : ""}</div>
+                        <div class="mini">${esc(a.notes||"")}</div>
+                      </div>
+                      <button class="miniBtn" data-toggle-save="${idx}">${a.saved ? "★ Saved" : "☆ Save"}</button>
+                    </div>
+                    <div class="actions">
+                      <a class="btn ghost" href="${mapsUrl}" target="_blank" rel="noreferrer">Maps</a>
+                      <button class="btn ghost" data-add-to-it="${idx}">Add to itinerary</button>
+                      <button class="btn danger" data-del-spot="${idx}">Delete</button>
+                    </div>
+                  </div>
+                `;
+              }).join("") : `<div class="muted">No matches. Add a spot or clear filters.</div>`
+            }
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function bindAttractions() {
+    state.__ui = state.__ui || {};
+    const q = document.getElementById("attrQ");
+    const c = document.getElementById("attrCity");
+    const s = document.getElementById("attrSaved");
+    q.oninput = () => { state.__ui.attrQ = q.value; markDirty(); rerender(false); };
+    c.onchange = () => { state.__ui.attrCity = c.value; markDirty(); rerender(false); };
+    s.onchange = () => { state.__ui.attrSaved = s.checked; markDirty(); rerender(false); };
+
+    document.getElementById("btnAddSpot").onclick = () => openSpotModal();
+    document.getElementById("btnMakeMap").onclick = () => {
+      const query = encodeURIComponent(state.trip.destination);
+      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
+    };
+
+    document.querySelectorAll("[data-toggle-save]").forEach(btn=>{
+      btn.onclick = () => {
+        const i = Number(btn.dataset.toggleSave);
+        state.attractions[i].saved = !state.attractions[i].saved;
+        markDirty(); rerender(false);
+      };
+    });
+    document.querySelectorAll("[data-del-spot]").forEach(btn=>{
+      btn.onclick = () => {
+        const i = Number(btn.dataset.delSpot);
+        if (!confirm("Delete this spot?")) return;
+        state.attractions.splice(i,1);
+        markDirty(); rerender();
+      };
+    });
+    document.querySelectorAll("[data-add-to-it]").forEach(btn=>{
+      btn.onclick = () => {
+        const i = Number(btn.dataset.addToIt);
+        const a = state.attractions[i];
+        openItineraryItemModal({ day: selectedDay, section: "Main events", prefill: {
+          text: a.name,
+          place: a.city || "",
+          time: "",
+          owner: ""
+        } });
+      };
+    });
+  }
+
+  // ---------------------------
+  // Render: Packing
+  // ---------------------------
+  function progress(items) {
+    const total = items.length || 0;
+    const done = items.filter(x=>x.packed).length;
+    return { total, done, pct: total ? Math.round(done/total*100) : 0 };
+  }
+
+  function renderPacking() {
+    const people = travellers();
+    return `
+      <section class="card">
+        <div class="hd">
+          <h2>Packing</h2>
+          <div class="row">
+            <button class="btn ghost" id="btnAddPackItem">Add item</button>
+            <button class="btn primary" id="btnPackAll">Mark selected person as packed</button>
+          </div>
+        </div>
+        <div class="bd">
+          <div class="split">
+            <div>
+              <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:8px;">People</div>
+              <div class="dayList" id="packPeople">
+                ${
+                  people.map(p=>{
+                    const pr = progress(state.packing[p] || []);
+                    const active = (state.__ui?.packPerson || people[0]) === p ? "active" : "";
+                    return `
+                      <div class="dayBtn ${active}" data-pack-person="${esc(p)}">
+                        <div class="d1">${esc(p)}</div>
+                        <div class="d2">${pr.done} / ${pr.total} packed • ${pr.pct}%</div>
+                      </div>
+                    `;
+                  }).join("")
+                }
+              </div>
+              <div class="hint">Packing lists start from your Excel template; edit freely.</div>
+            </div>
+
+            <div>
+              <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:8px;">Checklist</div>
+              <div id="packList"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function bindPacking() {
+    state.__ui = state.__ui || {};
+    const people = travellers();
+    const current = state.__ui.packPerson || people[0] || "";
+    function renderChecklist(person) {
+      const items = state.packing[person] || [];
+      const pr = progress(items);
+      document.getElementById("packList").innerHTML = `
+        <div class="row" style="justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div><strong>${esc(person)}</strong> <span class="pill">${pr.pct}%</span></div>
+          <div class="mono muted">${pr.done} / ${pr.total}</div>
+        </div>
+        <div class="bar" style="margin-bottom:12px"><div style="width:${pr.pct}%"></div></div>
+        <div class="list">
+          ${
+            items.map((it,idx)=>`
+              <div class="todo">
+                <input type="checkbox" data-pack="${esc(person)}" data-idx="${idx}" ${it.packed?"checked":""} />
+                <div>
+                  <div class="title">${esc(it.item)}</div>
+                  <div class="meta">Qty: <span class="mono">${esc(it.qty ?? 1)}</span> • Bag: <strong>${esc(it.luggage||"—")}</strong></div>
+                </div>
+                <button class="miniBtn" data-del-pack="${esc(person)}" data-idx="${idx}">Delete</button>
+              </div>
+            `).join("")
+          }
+        </div>
+      `;
+      document.querySelectorAll("[data-pack]").forEach(cb=>{
+        cb.onchange = () => {
+          const p = cb.dataset.pack;
+          const i = Number(cb.dataset.idx);
+          state.packing[p][i].packed = cb.checked;
+          markDirty(); rerender(false);
+        };
+      });
+      document.querySelectorAll("[data-del-pack]").forEach(btn=>{
+        btn.onclick = () => {
+          const p = btn.dataset.delPack;
+          const i = Number(btn.dataset.idx);
+          state.packing[p].splice(i,1);
+          markDirty(); rerender(false);
+        };
+      });
+    }
+
+    renderChecklist(current);
+
+    document.querySelectorAll("[data-pack-person]").forEach(btn=>{
+      btn.onclick = () => {
+        state.__ui.packPerson = btn.dataset.packPerson;
+        markDirty(); rerender(false);
+      };
+    });
+
+    document.getElementById("btnAddPackItem").onclick = () => openPackingModal();
+    document.getElementById("btnPackAll").onclick = () => {
+      const p = state.__ui.packPerson || people[0];
+      if (!p) return;
+      for (const it of (state.packing[p]||[])) it.packed = true;
+      markDirty(); rerender(false);
+    };
+  }
+
+  // ---------------------------
+  // Render: Polls & Ideas
+  // ---------------------------
+  function renderIdeas() {
+    const people = travellers();
+    return `
+      <div class="grid">
+        <section class="card">
+          <div class="hd">
+            <h2>Polls</h2>
+            <button class="btn primary" id="btnAddPoll">New poll</button>
+          </div>
+          <div class="bd">
+            <div class="list">
+              ${
+                state.polls.map((p,pi)=>`
+                  <div class="sectionBox">
+                    <div class="shd">
+                      <strong>${esc(p.question)}</strong>
+                      <button class="miniBtn" data-del-poll="${pi}">Delete</button>
+                    </div>
+                    <div class="sbd">
+                      ${
+                        p.options.map((o,oi)=>{
+                          const votes = o.votes || [];
+                          const pct = people.length ? Math.round((votes.length/people.length)*100) : 0;
+                          return `
+                            <div class="note">
+                              <div style="flex:1;">
+                                <div class="t"><strong>${esc(o.text)}</strong></div>
+                                <div class="small">${votes.length} vote${votes.length===1?"":"s"} • ${pct}%</div>
+                                <div class="bar" style="margin-top:8px"><div style="width:${pct}%"></div></div>
+                                <div class="small">${votes.length ? "Voted: " + esc(votes.join(", ")) : "No votes yet."}</div>
+                              </div>
+                              <div class="actions">
+                                <button class="miniBtn" data-vote="${pi}" data-opt="${oi}">Vote</button>
+                              </div>
+                            </div>
+                          `;
+                        }).join("")
+                      }
+                      <button class="btn ghost" data-add-opt="${pi}">Add option</button>
+                    </div>
+                  </div>
+                `).join("")
+              }
+            </div>
+            <div class="hint">Voting is stored in your browser. Use Export/Import to sync with the group.</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="hd">
+            <h2>Shared links</h2>
+            <button class="btn ghost" id="btnAddLink">Add link</button>
+          </div>
+          <div class="bd">
+            <div class="list">
+              ${
+                state.links.map((l,idx)=>`
+                  <div class="todo" style="grid-template-columns: 1fr auto;">
+                    <div>
+                      <div class="title">${esc(l.label)}</div>
+                      <div class="meta"><a href="${esc(l.url||"#")}" target="_blank" rel="noreferrer">${esc(l.url||"—")}</a></div>
+                    </div>
+                    <button class="miniBtn" data-del-link="${idx}">Delete</button>
+                  </div>
+                `).join("")
+              }
+            </div>
+            <div class="hint">Great for: a shared Google Map, booking pages, a Notion doc, or a spreadsheet link.</div>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  function bindIdeas() {
+    const people = travellers();
+
+    document.getElementById("btnAddPoll").onclick = () => openPollModal();
+    document.getElementById("btnAddLink").onclick = () => openLinkModal();
+
+    document.querySelectorAll("[data-del-poll]").forEach(btn=>{
+      btn.onclick = () => {
+        const i = Number(btn.dataset.delPoll);
+        state.polls.splice(i,1);
+        markDirty(); rerender();
+      };
+    });
+
+    document.querySelectorAll("[data-vote]").forEach(btn=>{
+      btn.onclick = () => {
+        const pi = Number(btn.dataset.vote);
+        const oi = Number(btn.dataset.opt);
+        openVoteModal(pi, oi);
+      };
+    });
+
+    document.querySelectorAll("[data-add-opt]").forEach(btn=>{
+      btn.onclick = () => {
+        const pi = Number(btn.dataset.addOpt);
+        openAddOptionModal(pi);
+      };
+    });
+
+    document.querySelectorAll("[data-del-link]").forEach(btn=>{
+      btn.onclick = () => {
+        const i = Number(btn.dataset.delLink);
+        state.links.splice(i,1);
+        markDirty(); rerender();
+      };
+    });
+  }
+
+  // ---------------------------
+  // Render: Settings
+  // ---------------------------
+  function renderSettings() {
+    return `
+      <div class="grid">
+        <section class="card">
+          <div class="hd">
+            <h2>Sync & sharing</h2>
+            <div class="row">
+              <button class="btn ghost" id="btnExport2">Export JSON</button>
+              <button class="btn ghost" id="btnImport2">Import JSON</button>
+              <button class="btn danger" id="btnReset">Reset</button>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="hint">
+              Because this is a static site (no server), edits are saved to <strong>your browser</strong>.
+              To keep the group synced:
+              <ol>
+                <li>One person exports JSON</li>
+                <li>Posts it in the group chat</li>
+                <li>Everyone imports it</li>
+              </ol>
+              If you want a true multi-user live site, I can upgrade this to a Firebase/Supabase backend.
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="hd">
+            <h2>Trip settings</h2>
+            <button class="btn primary" id="btnEditTrip2">Edit</button>
+          </div>
+          <div class="bd">
+            <table class="table">
+              <tbody>
+                <tr><td><strong>Site title</strong></td><td>${esc(state.trip.siteTitle)}</td></tr>
+                <tr><td><strong>Destination</strong></td><td>${esc(state.trip.destination)}</td></tr>
+                <tr><td><strong>Dates</strong></td><td class="mono">${esc(tripRangeLabel())}</td></tr>
+                <tr><td><strong>Travellers</strong></td><td>${travellers().map(esc).join(", ")}</td></tr>
+              </tbody>
+            </table>
+            <div class="hint">
+              Want the site to match your spreadsheet exactly (extra sheets/columns)?
+              Upload the latest Excel and I’ll wire in a one-click importer.
+            </div>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  function bindSettings() {
+    document.getElementById("btnExport2").onclick = () => exportJson();
+    document.getElementById("btnImport2").onclick = () => document.getElementById("fileInput").click();
+    document.getElementById("btnReset").onclick = () => {
+      if (!confirm("Reset everything back to the original Excel import?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = deepClone(window.__INITIAL_DATA__);
+      ensureItineraryShape();
+      markDirty();
+      rerender();
+    };
+    document.getElementById("btnEditTrip2").onclick = () => openTripModal();
+    document.getElementById("btnImport2").onclick = () => document.getElementById("fileInput").click();
+  }
+
+  // ---------------------------
+  // Modals (forms)
+  // ---------------------------
+  function openTodoModal() {
+    const people = travellers();
+    openModal({
+      title: "Add task",
+      sub: "Keep it short and assign an owner if you want.",
+      bodyHtml: `
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Task</div>
+            <input class="input" id="todoTitle" placeholder="e.g. Book DMZ tour" />
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Owner</div>
+            <select id="todoOwner">
+              <option value="">Unassigned</option>
+              ${
+                people.map(p=>`<option>${esc(p)}</option>`).join("")
+              }
+            </select>
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <div>
+          <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Due date (optional)</div>
+          <input class="input" id="todoDue" type="date" />
+        </div>
+        <div style="height:12px"></div>
+        <button class="btn primary" id="todoSave">Add task</button>
+      `
+    });
+    document.getElementById("todoSave").onclick = () => {
+      const title = document.getElementById("todoTitle").value.trim();
+      if (!title) return alert("Task title required.");
+      const owner = document.getElementById("todoOwner").value;
+      const due = document.getElementById("todoDue").value;
+      state.todos.unshift({title, owner, due, done:false});
+      markDirty(); closeModal(); rerender();
+    };
+  }
+
+  function openTripModal() {
+    const people = travellers();
+    openModal({
+      title: "Edit trip",
+      sub: "These fields control the whole site.",
+      bodyHtml: `
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Site title</div>
+            <input class="input" id="tripTitle" value="${esc(state.trip.siteTitle)}" />
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Destination</div>
+            <input class="input" id="tripDest" value="${esc(state.trip.destination)}" />
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Start date</div>
+            <input class="input" id="tripStart" type="date" value="${esc(state.trip.startDate)}" />
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">End date</div>
+            <input class="input" id="tripEnd" type="date" value="${esc(state.trip.endDate)}" />
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <div>
+          <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Travellers (comma-separated)</div>
+          <input class="input" id="tripPeople" value="${esc(travellers().join(", "))}" />
+        </div>
+        <div style="height:12px"></div>
+        <button class="btn primary" id="tripSave">Save</button>
+      `
+    });
+    document.getElementById("tripSave").onclick = () => {
+      state.trip.siteTitle = document.getElementById("tripTitle").value.trim() || state.trip.siteTitle;
+      state.trip.destination = document.getElementById("tripDest").value.trim() || state.trip.destination;
+      const s = document.getElementById("tripStart").value;
+      const e = document.getElementById("tripEnd").value;
+      if (s) state.trip.startDate = s;
+      if (e) state.trip.endDate = e;
+
+      const ppl = document.getElementById("tripPeople").value
+        .split(",").map(x=>x.trim()).filter(Boolean);
+      if (ppl.length) state.trip.travellers = ppl;
+
+      // rebuild days list from dates (inclusive)
+      const start = dayjs(state.trip.startDate);
+      const end = dayjs(state.trip.endDate);
+      const days = [];
+      let cur = start;
+      while (cur.isBefore(end) || cur.isSame(end,"day")) {
+        days.push(cur.format("YYYY-MM-DD"));
+        cur = cur.add(1,"day");
+      }
+      state.itinerary.days = days;
+      ensureItineraryShape();
+
+      // ensure packing keys exist for all travellers
+      for (const p of state.trip.travellers) {
+        if (!state.packing[p]) state.packing[p] = [];
+      }
+
+      markDirty();
+      closeModal();
+      rerender();
+    };
+  }
+
+  function openExpenseModal({goToBudget}) {
+    const cats = state.budget.categories.map(c=>c.category);
+    const people = travellers();
+    openModal({
+      title: "Add expense",
+      sub: "Log spend in AUD (site can store KRW too, but AUD drives split).",
+      bodyHtml: `
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Category</div>
+            <select id="exCat">
+              ${
+                cats.map(c=>`<option>${esc(c)}</option>`).join("")
+              }
+            </select>
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Paid by</div>
+            <select id="exBy">
+              <option value="">—</option>
+              ${
+                people.map(p=>`<option>${esc(p)}</option>`).join("")
+              }
+            </select>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div>
+          <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Description</div>
+          <input class="input" id="exDesc" placeholder="e.g. T-money cards + snacks" />
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">AUD</div>
+            <input class="input mono" id="exAud" type="number" step="0.01" placeholder="0.00" />
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">KRW (optional)</div>
+            <input class="input mono" id="exKrw" type="number" step="1" placeholder="0" />
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="row">
+          <label class="row" style="gap:8px;">
+            <input type="checkbox" id="exPaid" checked />
+            <span class="muted" style="font-size:12px; font-weight:650;">Marked as paid</span>
+          </label>
+          <input class="input" id="exDate" type="date" style="max-width:210px" />
+        </div>
+
+        <div style="height:12px"></div>
+        <button class="btn primary" id="exSave">Add expense</button>
+      `
+    });
+
+    document.getElementById("exSave").onclick = () => {
+      const category = document.getElementById("exCat").value;
+      const description = document.getElementById("exDesc").value.trim();
+      const aud = Number(document.getElementById("exAud").value || 0);
+      const krw = Number(document.getElementById("exKrw").value || 0);
+      const paidBy = document.getElementById("exBy").value;
+      const paid = document.getElementById("exPaid").checked;
+      const date = document.getElementById("exDate").value;
+      if (!category) return alert("Category required.");
+      state.budget.expenses.unshift({
+        category, description, currency: "$",
+        aud, krw, paid, paidBy, date, notes:""
+      });
+      // bump category actual
+      const cat = state.budget.categories.find(c=>c.category===category);
+      if (cat) cat.actual = Number(cat.actual||0) + aud;
+
+      markDirty();
+      closeModal();
+      if (goToBudget) setHash("budget");
+      rerender();
+    };
+  }
+
+  function openCategoryModal() {
+    openModal({
+      title: "Add category",
+      sub: "Add a new budget bucket.",
+      bodyHtml: `
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Category name</div>
+            <input class="input" id="catName" placeholder="e.g. Cafés" />
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Estimated (AUD)</div>
+            <input class="input mono" id="catEst" type="number" step="0.01" placeholder="0.00" />
+          </div>
+        </div>
+        <div style="height:12px"></div>
+        <button class="btn primary" id="catSave">Add</button>
+      `
+    });
+    document.getElementById("catSave").onclick = () => {
+      const category = document.getElementById("catName").value.trim();
+      const estimated = Number(document.getElementById("catEst").value || 0);
+      if (!category) return alert("Category name required.");
+      state.budget.categories.push({category, estimated, actual:0});
+      markDirty(); closeModal(); rerender();
+    };
+  }
+
+  function openItineraryItemModal({day, section, idx, prefill}) {
+    ensureItineraryShape();
+    const people = travellers();
+    const sec = section || "Main events";
+    const editing = (idx != null);
+    const it = editing ? state.itinerary.items[day][sec][idx] : (prefill || {text:"", time:"", place:"", owner:""});
+    openModal({
+      title: editing ? "Edit itinerary item" : "Add itinerary item",
+      sub: `${dayLabel(day)} • ${sec}`,
+      bodyHtml: `
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Section</div>
+            <select id="itSec">
+              ${
+                state.itinerary.sections.map(s=>`<option ${s===sec?"selected":""}>${esc(s)}</option>`).join("")
+              }
+            </select>
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Owner (optional)</div>
+            <select id="itOwner">
+              <option value="">—</option>
+              ${
+                people.map(p=>`<option ${p===it.owner?"selected":""}>${esc(p)}</option>`).join("")
+              }
+            </select>
+          </div>
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div>
+          <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">What</div>
+          <input class="input" id="itText" value="${esc(it.text||"")}" placeholder="e.g. Gyeongbokgung Palace + guard change" />
+        </div>
+
+        <div style="height:10px"></div>
+
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Time (optional)</div>
+            <input class="input" id="itTime" value="${esc(it.time||"")}" placeholder="e.g. 10:00" />
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Place (optional)</div>
+            <input class="input" id="itPlace" value="${esc(it.place||"")}" placeholder="e.g. Seoul" />
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+        <button class="btn primary" id="itSave">${editing?"Save changes":"Add item"}</button>
+      `
+    });
+    document.getElementById("itSave").onclick = () => {
+      const newSec = document.getElementById("itSec").value;
+      const item = {
+        text: document.getElementById("itText").value.trim(),
+        time: document.getElementById("itTime").value.trim(),
+        place: document.getElementById("itPlace").value.trim(),
+        owner: document.getElementById("itOwner").value
+      };
+      if (!item.text) return alert("Please add a 'What' description.");
+
+      if (editing) {
+        // if section changed, move item
+        if (newSec !== sec) {
+          state.itinerary.items[day][sec].splice(idx,1);
+          state.itinerary.items[day][newSec].push(item);
+        } else {
+          state.itinerary.items[day][sec][idx] = item;
         }
-      };
+      } else {
+        state.itinerary.items[day][newSec].push(item);
+      }
+      markDirty();
+      closeModal();
+      rerender();
+    };
+  }
 
-      $("#btnShare").onclick = ()=>{
-        const msg =
-`Churros take South Korea — sharing plan:
-1) Open the site (or the local HTML file).
-2) Hit Export and send the JSON in the group chat.
-3) Whoever imports latest becomes “source of truth” and re-exports.
+  function openAddDayModal() {
+    openModal({
+      title: "Add day",
+      sub: "Append a day to the itinerary list.",
+      bodyHtml: `
+        <div>
+          <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Date</div>
+          <input class="input" id="newDay" type="date" />
+        </div>
+        <div style="height:12px"></div>
+        <button class="btn primary" id="addDaySave">Add day</button>
+      `
+    });
+    document.getElementById("addDaySave").onclick = () => {
+      const d = document.getElementById("newDay").value;
+      if (!d) return alert("Pick a date.");
+      if (state.itinerary.days.includes(d)) return alert("That day already exists.");
+      state.itinerary.days.push(d);
+      state.itinerary.days.sort();
+      ensureItineraryShape();
+      selectedDay = d;
+      markDirty(); closeModal(); rerender();
+    };
+  }
 
-People: Henry, Cordelia, Jesse, Oliver, Mikaela, Amy`;
-        navigator.clipboard?.writeText(msg);
-        toast("Copied share note");
-      };
+  function openSpotModal() {
+    openModal({
+      title: "Add spot",
+      sub: "Add an attraction / restaurant / market / anything.",
+      bodyHtml: `
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Name</div>
+            <input class="input" id="spotName" placeholder="e.g. Gwangjang Market" />
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">City</div>
+            <input class="input" id="spotCity" placeholder="e.g. Seoul" />
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Opening hours (optional)</div>
+            <input class="input" id="spotHours" placeholder="e.g. 10:00–22:00" />
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Fee in won (optional)</div>
+            <input class="input mono" id="spotFee" type="number" step="1" placeholder="0" />
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <div>
+          <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Notes</div>
+          <input class="input" id="spotNotes" placeholder="e.g. Must try bindaetteok" />
+        </div>
+        <div style="height:12px"></div>
+        <button class="btn primary" id="spotSave">Add spot</button>
+      `
+    });
+    document.getElementById("spotSave").onclick = () => {
+      const name = document.getElementById("spotName").value.trim();
+      if (!name) return alert("Name required.");
+      const city = document.getElementById("spotCity").value.trim();
+      const hours = document.getElementById("spotHours").value.trim();
+      const feeWon = Number(document.getElementById("spotFee").value || 0);
+      const notes = document.getElementById("spotNotes").value.trim();
+      state.attractions.unshift({name, city, hours, feeWon, notes, saved:false, tags:[], address:""});
+      markDirty(); closeModal(); rerender();
+    };
+  }
 
-      $("#btnQuickAdd").onclick = ()=>{
-        // jump to overview and focus quick add
-        $$('.tab').forEach(b=>b.classList.remove("active"));
-        document.querySelector('.tab[data-tab="overview"]').classList.add("active");
-        $$('.section').forEach(s=>s.classList.remove("active"));
-        $("#overview").classList.add("active");
-        $("#qaTitle").focus();
-      };
+  function openPackingModal() {
+    const people = travellers();
+    state.__ui = state.__ui || {};
+    const current = state.__ui.packPerson || people[0] || "";
+    openModal({
+      title: "Add packing item",
+      sub: "Add an item to someone’s list.",
+      bodyHtml: `
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Person</div>
+            <select id="pkPerson">
+              ${
+                people.map(p=>`<option ${p===current?"selected":""}>${esc(p)}</option>`).join("")
+              }
+            </select>
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Qty</div>
+            <input class="input mono" id="pkQty" type="number" step="1" value="1" />
+          </div>
+        </div>
+        <div style="height:10px"></div>
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Item</div>
+            <input class="input" id="pkItem" placeholder="e.g. Portable charger" />
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Bag (optional)</div>
+            <input class="input" id="pkBag" placeholder="e.g. Carry-on" />
+          </div>
+        </div>
+        <div style="height:12px"></div>
+        <button class="btn primary" id="pkSave">Add</button>
+      `
+    });
+    document.getElementById("pkSave").onclick = () => {
+      const person = document.getElementById("pkPerson").value;
+      const item = document.getElementById("pkItem").value.trim();
+      const luggage = document.getElementById("pkBag").value.trim();
+      const qty = Number(document.getElementById("pkQty").value || 1);
+      if (!person || !item) return alert("Person and item required.");
+      state.packing[person] = state.packing[person] || [];
+      state.packing[person].unshift({item, luggage, qty, packed:false});
+      state.__ui.packPerson = person;
+      markDirty(); closeModal(); rerender(false);
+    };
+  }
+
+  function openPollModal() {
+    openModal({
+      title: "New poll",
+      sub: "Ask the group to choose (food, day trips, hotels…).",
+      bodyHtml: `
+        <div>
+          <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Question</div>
+          <input class="input" id="pollQ" placeholder="e.g. Which day trip?" />
+        </div>
+        <div style="height:10px"></div>
+        <div class="split">
+          <div><input class="input" id="pollO1" placeholder="Option 1" /></div>
+          <div><input class="input" id="pollO2" placeholder="Option 2" /></div>
+        </div>
+        <div style="height:12px"></div>
+        <button class="btn primary" id="pollSave">Create poll</button>
+      `
+    });
+    document.getElementById("pollSave").onclick = () => {
+      const q = document.getElementById("pollQ").value.trim();
+      const o1 = document.getElementById("pollO1").value.trim();
+      const o2 = document.getElementById("pollO2").value.trim();
+      if (!q || !o1) return alert("Need a question + at least one option.");
+      const options = [o1,o2].filter(Boolean).map(t=>({text:t, votes:[]}));
+      state.polls.unshift({question:q, options});
+      markDirty(); closeModal(); rerender();
+    };
+  }
+
+  function openVoteModal(pi, oi) {
+    const people = travellers();
+    const poll = state.polls[pi];
+    const opt = poll.options[oi];
+    openModal({
+      title: "Vote",
+      sub: poll.question,
+      bodyHtml: `
+        <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Choose your name</div>
+        <select id="voteName">
+          ${
+            people.map(p=>`<option>${esc(p)}</option>`).join("")
+          }
+        </select>
+        <div style="height:10px"></div>
+        <div class="hint">Voting toggles: if you already voted for this option, voting again removes your vote.</div>
+        <div style="height:12px"></div>
+        <button class="btn primary" id="voteSave">Vote for “${esc(opt.text)}”</button>
+      `
+    });
+    document.getElementById("voteSave").onclick = () => {
+      const name = document.getElementById("voteName").value;
+      // Remove from all options first (one vote per poll)
+      for (const o of poll.options) {
+        o.votes = (o.votes||[]).filter(v=>v!==name);
+      }
+      // Toggle on selected option
+      const cur = opt.votes || [];
+      if (!cur.includes(name)) cur.push(name);
+      opt.votes = cur;
+      markDirty(); closeModal(); rerender(false);
+    };
+  }
+
+  function openAddOptionModal(pi) {
+    openModal({
+      title: "Add option",
+      sub: "Add another choice to the poll.",
+      bodyHtml: `
+        <div>
+          <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Option text</div>
+          <input class="input" id="optText" placeholder="e.g. Lotte World" />
+        </div>
+        <div style="height:12px"></div>
+        <button class="btn primary" id="optSave">Add</button>
+      `
+    });
+    document.getElementById("optSave").onclick = () => {
+      const t = document.getElementById("optText").value.trim();
+      if (!t) return alert("Option text required.");
+      state.polls[pi].options.push({text:t, votes:[]});
+      markDirty(); closeModal(); rerender(false);
+    };
+  }
+
+  function openLinkModal() {
+    openModal({
+      title: "Add link",
+      sub: "Paste in anything useful for the group.",
+      bodyHtml: `
+        <div class="split">
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Label</div>
+            <input class="input" id="linkLabel" placeholder="e.g. Shared Google Map" />
+          </div>
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">URL</div>
+            <input class="input" id="linkUrl" placeholder="https://…" />
+          </div>
+        </div>
+        <div style="height:12px"></div>
+        <button class="btn primary" id="linkSave">Add</button>
+      `
+    });
+    document.getElementById("linkSave").onclick = () => {
+      const label = document.getElementById("linkLabel").value.trim();
+      const url = document.getElementById("linkUrl").value.trim();
+      if (!label) return alert("Label required.");
+      state.links.unshift({label, url});
+      markDirty(); closeModal(); rerender(false);
+    };
+  }
+
+  // Quick add menu
+  function openQuickAdd() {
+    openModal({
+      title: "Quick add",
+      sub: "Pick what you want to add.",
+      bodyHtml: `
+        <div class="split">
+          <button class="btn primary" id="qaIt">Add itinerary item</button>
+          <button class="btn primary" id="qaEx">Log expense</button>
+          <button class="btn primary" id="qaTodo">Add task</button>
+          <button class="btn primary" id="qaSpot">Add attraction</button>
+        </div>
+        <div style="height:10px"></div>
+        <div class="hint">Shortcut: press <span class="kbd">/</span> anywhere to open Quick add.</div>
+      `
+    });
+    document.getElementById("qaIt").onclick = () => { closeModal(); openItineraryItemModal({day:selectedDay}); };
+    document.getElementById("qaEx").onclick = () => { closeModal(); openExpenseModal({goToBudget:false}); };
+    document.getElementById("qaTodo").onclick = () => { closeModal(); openTodoModal(); };
+    document.getElementById("qaSpot").onclick = () => { closeModal(); openSpotModal(); };
+  }
+
+  // ---------------------------
+  // Export / Import
+  // ---------------------------
+  function exportJson() {
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "churros-take-south-korea.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function importJsonFromFile(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const obj = JSON.parse(reader.result);
+        state = Object.assign(deepClone(window.__INITIAL_DATA__), obj);
+        ensureItineraryShape();
+        markDirty();
+        rerender();
+      } catch(e) {
+        alert("Invalid JSON file.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // ---------------------------
+  // Main render loop
+  // ---------------------------
+  function rerender(full=true) {
+    // header
+    document.getElementById("brandTitle").textContent = state.trip.siteTitle || "Churros take South Korea";
+    document.getElementById("tripLine").textContent = state.trip.destination || "South Korea";
+    document.getElementById("dateLine").textContent = tripRangeLabel();
+
+    renderNav();
+
+    const page = currentPage();
+    if (page === "overview") {
+      viewEl.innerHTML = renderOverview();
+      bindOverview();
+    } else if (page === "itinerary") {
+      viewEl.innerHTML = renderItinerary();
+      bindItinerary();
+    } else if (page === "budget") {
+      viewEl.innerHTML = renderBudget();
+      bindBudget();
+    } else if (page === "attractions") {
+      viewEl.innerHTML = renderAttractions();
+      bindAttractions();
+    } else if (page === "packing") {
+      viewEl.innerHTML = renderPacking();
+      bindPacking();
+    } else if (page === "ideas") {
+      viewEl.innerHTML = renderIdeas();
+      bindIdeas();
+    } else if (page === "settings") {
+      viewEl.innerHTML = renderSettings();
+      bindSettings();
     }
+  }
 
-    // --- Boot ---
-    initPeople();
-    tabInit();
-    initOverview();
-    btnInit();
+  window.addEventListener("hashchange", () => rerender());
 
-    // If empty, seed some starter rows (so it doesn't feel blank)
-    if(data.itinerary.length===0 && data.budget.length===0 && data.decisions.length===0 && data.packing.length===0){
-      data.itinerary.push({ id: uid(), date:"", time:"", plan:"Arrive + check-in", where:"", owner:"Henry", status:"planned" });
-      data.budget.push({ id: uid(), item:"Accommodation deposit", category:"Stay", cost:0, paidBy:"", split:"even-6", status:"unpaid" });
-      data.decisions.push({ id: uid(), decision:"Choose neighbourhood to stay", notes:"Hongdae vs Myeongdong vs Insadong", owner:"", priority:"high" });
-      data.packing.push({ id: uid(), item:"Travel adapter (Type C/F)", type:"group", owner:"", status:"need" });
-      save();
-    } else {
-      recalcKPIs();
-      $("#saveInfo").textContent = `Last saved: ${new Date(data.meta.updated).toLocaleString()}`;
+  // Top buttons
+  document.getElementById("btnExport").onclick = () => exportJson();
+  document.getElementById("btnImport").onclick = () => document.getElementById("fileInput").click();
+  document.getElementById("btnQuickAdd").onclick = () => openQuickAdd();
+
+  document.getElementById("fileInput").addEventListener("change", (e)=>{
+    const file = e.target.files?.[0];
+    if (file) importJsonFromFile(file);
+    e.target.value = "";
+  });
+
+  // Keyboard shortcuts
+  window.addEventListener("keydown", (e)=>{
+    if (e.key === "/" && !["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName)) {
+      e.preventDefault();
+      openQuickAdd();
     }
+    if (e.key === "Escape") closeModal();
+  });
 
-    renderAll();
+  // Initial render
+  rerender();
+
   </script>
 </body>
 </html>
+
+
