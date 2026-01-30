@@ -1,0 +1,296 @@
+{
+  "meta": {
+    "title": "Churros take South Korea",
+    "version": 1,
+    "created": "2026-01-30T05:21:36.404133"
+  },
+  "trip": {
+    "siteTitle": "Churros take South Korea",
+    "destination": "South Korea",
+    "startDate": "2026-08-25",
+    "endDate": "2026-09-08",
+    "travellers": [
+      "Henry",
+      "Cordelia",
+      "Jesse",
+      "Oliver",
+      "Mikaela",
+      "Amy"
+    ]
+  },
+  "todos": [
+    {
+      "title": "Sort Route",
+      "owner": "Cordelia",
+      "due": "2026-02-14",
+      "done": false
+    },
+    {
+      "title": "Book Accom",
+      "owner": "",
+      "due": "2026-02-28",
+      "done": false
+    }
+  ],
+  "budget": {
+    "categories": [
+      {
+        "category": "International Flights",
+        "estimated": 0,
+        "actual": 2760
+      },
+      {
+        "category": "Internal Flights",
+        "estimated": 0,
+        "actual": 0
+      },
+      {
+        "category": "Buses/Trains",
+        "estimated": 0,
+        "actual": 0
+      },
+      {
+        "category": "Accom",
+        "estimated": 0,
+        "actual": 0
+      },
+      {
+        "category": "Activities",
+        "estimated": 0,
+        "actual": 0
+      }
+    ],
+    "expenses": [
+      {
+        "category": "International Flights",
+        "description": "Jetstar",
+        "currency": "$",
+        "aud": 2760,
+        "krw": 0,
+        "paid": true,
+        "paidBy": "Henry",
+        "date": "2026-01-28",
+        "participants": [
+          "Henry",
+          "Cordelia",
+          "Jesse",
+          "Oliver",
+          "Mikaela",
+          "Amy"
+        ],
+        "notes": ""
+      }
+    ]
+  },
+  "itinerary": {
+    "startDate": "",
+    "endDate": "",
+    "days": [
+      "2026-08-25",
+      "2026-08-26",
+      "2026-08-27",
+      "2026-08-28",
+      "2026-08-29",
+      "2026-08-30",
+      "2026-08-31",
+      "2026-09-01",
+      "2026-09-02",
+      "2026-09-03",
+      "2026-09-04",
+      "2026-09-05",
+      "2026-09-06",
+      "2026-09-07",
+      "2026-09-08"
+    ],
+    "sections": [
+      "Morning",
+      "Afternoon",
+      "Evening"
+    ],
+    "items": {
+      "2026-08-25": {
+        "Morning": [],
+        "Afternoon": [
+          {
+            "text": "Land in Seoul",
+            "time": "20:15",
+            "place": "Seoul Airport",
+            "owner": ""
+          }
+        ],
+        "Evening": [
+          {
+            "text": "Dinner",
+            "time": "22:00",
+            "place": "Hongdae, South Korea",
+            "owner": ""
+          }
+        ]
+      },
+      "2026-08-26": {
+        "Morning": [
+          {
+            "text": "Changing of the Guard",
+            "time": "10:00",
+            "place": "Gyeongbokgung Palace",
+            "owner": "Cordelia"
+          }
+        ],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-08-27": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-08-28": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-08-29": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-08-30": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-08-31": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-09-01": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-09-02": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-09-03": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-09-04": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-09-05": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-09-06": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-09-07": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      },
+      "2026-09-08": {
+        "Morning": [],
+        "Afternoon": [],
+        "Evening": []
+      }
+    },
+    "attractions": [],
+    "packing": {
+      "Henry": [],
+      "Cordelia": [],
+      "Jesse": [],
+      "Oliver": [],
+      "Mikaela": [],
+      "Amy": []
+    },
+    "polls": [],
+    "links": []
+  },
+  "attractions": [
+    {
+      "name": "Jeju Island",
+      "city": "Jeju Island",
+      "hours": "",
+      "feeWon": 0,
+      "notes": "",
+      "saved": false,
+      "tags": [],
+      "address": ""
+    },
+    {
+      "name": "Gwangjang Market",
+      "city": "Gwangjang Market",
+      "hours": "",
+      "feeWon": 0,
+      "notes": "",
+      "saved": false,
+      "tags": [],
+      "address": ""
+    },
+    {
+      "name": "Busan Beach",
+      "city": "Busan",
+      "hours": "",
+      "feeWon": 0,
+      "notes": "",
+      "saved": false,
+      "tags": [],
+      "address": ""
+    }
+  ],
+  "polls": [
+    {
+      "question": "Seoul",
+      "options": [
+        {
+          "text": "Start of Trip",
+          "votes": [
+            "Henry"
+          ]
+        },
+        {
+          "text": "End of Trip",
+          "votes": []
+        }
+      ]
+    }
+  ],
+  "links": [],
+  "packing": {
+    "Henry": [
+      {
+        "item": "Slushie Machine",
+        "luggage": "",
+        "qty": 1,
+        "packed": false
+      }
+    ],
+    "Cordelia": [
+      {
+        "item": "Board Games",
+        "luggage": "",
+        "qty": 1,
+        "packed": false
+      }
+    ],
+    "Jesse": [],
+    "Oliver": [],
+    "Mikaela": [],
+    "Amy": []
+  },
+  "__ui": {
+    "packPerson": "Henry",
+    "spotMapIdx": 2
+  }
+}
