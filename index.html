@@ -163,7 +163,7 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: 1.2fr .8fr;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
       gap: 18px;
     }
     @media (max-width: 1100px) {
@@ -297,7 +297,7 @@
     .input:focus, select:focus { border-color: rgba(110,80,255,.42); box-shadow: 0 0 0 4px rgba(110,80,255,.10); }
     .split {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 12px;
     }
     @media (max-width: 860px) {
@@ -473,7 +473,47 @@
       border: 1px solid var(--border);
       background: rgba(255,255,255,.8);
     }
-  </style>
+  
+    /* Per-expense participants chips */
+    .chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .chipBtn{
+      border:1px solid var(--border);
+      background: rgba(247,248,251,.6);
+      border-radius:999px;
+      padding:8px 10px;
+      font-weight:700;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .06s ease, border-color .2s ease, background .2s ease;
+    }
+    .chipBtn:hover{ border-color:#cbd5e1; }
+    .chipBtn:active{ transform: translateY(1px); }
+    .chipBtn.on{
+      background: linear-gradient(135deg, rgba(79,70,229,.16), rgba(6,182,212,.14));
+      border-color: rgba(79,70,229,.35);
+    }
+    .chipBtn.off{ opacity:.55; }
+
+    /* Embedded maps */
+    .mapBox{
+      border: 1px solid var(--border);
+      background: rgba(247,248,251,.5);
+      border-radius: 18px;
+      padding: 12px;
+    }
+    .mapFrame{
+      width:100%;
+      height: 360px;
+      border: 0;
+      border-radius: 14px;
+      background: white;
+    }
+    @media (max-width: 1100px){
+      .mapFrame{ height: 320px; }
+    }
+
+</style>
 </head>
 <body>
   <script>
@@ -486,7 +526,7 @@
         <div class="logo">🍩</div>
         <div>
           <h1 id="brandTitle">Churros take South Korea</h1>
-          <div class="sub" id="brandSub">Or North Korea Undecided as of Yet</div>
+          <div class="sub" id="brandSub">Or North Korea</div>
         </div>
       </div>
 
@@ -636,9 +676,12 @@
       const aud = Number(ex.aud || 0);
       if (!aud || aud === 0) continue;
       const paidBy = ex.paidBy || "";
-      const splitN = people.length || 1;
+      const parts = (Array.isArray(ex.participants) && ex.participants.length)
+        ? ex.participants
+        : people;
+      const splitN = parts.length || 1;
       const share = aud / splitN;
-      for (const p of people) balances[p] -= share;
+      for (const p of parts) if (balances[p] != null) balances[p] -= share;
       if (paidBy && balances[paidBy] != null) balances[paidBy] += aud;
     }
     // Round to cents for stability
@@ -768,7 +811,6 @@
                 <div class="bar" style="margin-top:8px"><div style="width:${pct}%"></div></div>
 
                 <div class="hint">
-    
                 </div>
               </div>
 
@@ -779,7 +821,6 @@
                   <div class="pill">Est. ${fmtAUD(budgetE)}</div>
                 </div>
                 <div class="hint">
-                  Current split: <strong>${fmtAUD(perPerson)}</strong> per person (even split, adjustable in Budget).
                 </div>
               </div>
             </div>
@@ -916,6 +957,21 @@
       `;
     }).join("");
 
+
+    const mapItems = [];
+    for (const sec of state.itinerary.sections) {
+      const items = (state.itinerary.items[selectedDay] && state.itinerary.items[selectedDay][sec]) ? state.itinerary.items[selectedDay][sec] : [];
+      for (const it of items) {
+        const place = (it.place||"").trim();
+        if (!place) continue;
+        mapItems.push({ label: `${it.text}${place?` • ${place}`:""}`, query: place });
+      }
+    }
+    const itMapIdx = Math.min(Number(state.__ui?.itMapIdx ?? 0), Math.max(mapItems.length-1, 0));
+    const itMapQuery = mapItems[itMapIdx]?.query || (state.trip.destination || "South Korea");
+    const itMapSrc = `https://www.google.com/maps?q=${encodeURIComponent(itMapQuery)}&output=embed`;
+
+
     return `
       <div class="itGrid">
         <section class="card">
@@ -942,6 +998,17 @@
           </div>
           <div class="bd" style="display:grid; gap:12px;">
             ${secHtml}
+            <div class="mapBox">
+              <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Map for this day</div>
+              <select id="itMapPick" style="margin-bottom:10px;">
+                ${
+                  mapItems.length
+                    ? mapItems.map((m,i)=>`<option value="${i}" ${i===itMapIdx?"selected":""}>${esc(m.label)}</option>`).join("")
+                    : `<option value="0">Add itinerary items with a 📍 place to show them here</option>`
+                }
+              </select>
+              <iframe class="mapFrame" id="itMapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${itMapSrc}"></iframe>
+            </div>
           </div>
         </section>
       </div>
@@ -958,6 +1025,18 @@
 
     document.getElementById("btnAddBig").onclick = () => openItineraryItemModal({day:selectedDay});
     document.getElementById("btnAddDay").onclick = () => openAddDayModal();
+
+    // Map for itinerary day
+    const itPick = document.getElementById("itMapPick");
+    const itFrame = document.getElementById("itMapFrame");
+    if (itPick && itFrame) {
+      itPick.onchange = () => {
+        state.__ui.itMapIdx = Number(itPick.value || 0);
+        const label = itPick.options[itPick.selectedIndex]?.textContent || (state.trip.destination || "South Korea");
+        itFrame.src = `https://www.google.com/maps?q=${encodeURIComponent(label)}&output=embed`;
+        markDirty();
+      };
+    }
 
     document.querySelectorAll("[data-add-it]").forEach(btn=>{
       btn.onclick = () => openItineraryItemModal({day:selectedDay, section: btn.dataset.addIt});
@@ -1017,7 +1096,7 @@
             <div class="split">
               <div>
                 <canvas id="budgetChart" height="160"></canvas>
-                <div class="hint">Chart shows <strong>actual spend</strong> by category. Categories with $0 hide themselves.</div>
+                <div class="hint"></div>
               </div>
               <div>
                 <div class="kpi">
@@ -1058,7 +1137,6 @@
 
                 <div class="hint">
                   Balance = how much the group owes that person (positive), or how much they owe the group (negative).
-                  This assumes an <strong>even split across all travellers</strong>.
                 </div>
               </div>
             </div>
@@ -1132,15 +1210,14 @@
           </div>
           <div class="bd">
             <div id="settleBox" class="muted">
-              Click <strong>Suggest transfers</strong> to generate a simple “who pays who” list (even split).
+              <strong>Suggest transfers
             </div>
 
             <div style="height:12px"></div>
 
-            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:8px;">Pro tips</div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:8px;">Tip</div>
             <div class="hint">
-              • Keep descriptions short so it’s readable on mobile.<br/>
-              • If someone didn’t join an activity, duplicate the expense and change the split logic later (or just note it).
+              • Keep descriptions short so it’s readable on mobile.
             </div>
           </div>
         </section>
@@ -1290,6 +1367,10 @@
       return matchesQ && matchesCity && matchesSaved;
     });
 
+    const mapIdx = Math.min(Number(state.__ui?.spotMapIdx ?? 0), Math.max(filtered.length-1, 0));
+    const mapQuery = filtered[mapIdx] ? `${filtered[mapIdx].name} ${filtered[mapIdx].city||""}` : (state.trip.destination||"South Korea");
+    const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
+
     return `
       <section class="card">
         <div class="hd">
@@ -1321,7 +1402,9 @@
 
           <div style="height:14px"></div>
 
-          <div class="cards">
+          
+          <div class="split" style="grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr); align-items:start;">
+            <div class="cards">
             ${
               filtered.length ? filtered.map((a,idx)=>{
                 const mapsQ = encodeURIComponent(`${a.name} ${a.city||""}`);
@@ -1331,6 +1414,20 @@
                     <div class="row" style="justify-content:space-between; align-items:flex-start;">
                       <div>
                         <div class="name">${esc(a.name)}</div>
+            <div class="mapBox">
+              <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Map preview</div>
+              <select id="spotMapPick" style="margin-bottom:10px;">
+                ${
+                  filtered.length
+                    ? filtered.map((a,i)=>`<option value="${i}" ${i===mapIdx?"selected":""}>${esc(a.name)}${a.city?` • ${esc(a.city)}`:""}</option>`).join("")
+                    : `<option value="0">No spots yet</option>`
+                }
+              </select>
+              <iframe class="mapFrame" id="spotMapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${mapSrc}"></iframe>
+              <div class="hint" style="margin-top:10px">Tip: add a city or address in the spot notes for better results.</div>
+            </div>
+          </div>
+    
                         <div class="mini">${esc([a.city, a.hours].filter(Boolean).join(" • "))}</div>
                         <div class="mini">${a.feeWon ? "₩ " + fmt(a.feeWon) : ""}</div>
                         <div class="mini">${esc(a.notes||"")}</div>
@@ -1360,6 +1457,19 @@
     q.oninput = () => { state.__ui.attrQ = q.value; markDirty(); rerender(false); };
     c.onchange = () => { state.__ui.attrCity = c.value; markDirty(); rerender(false); };
     s.onchange = () => { state.__ui.attrSaved = s.checked; markDirty(); rerender(false); };
+
+    // Map preview (attractions)
+    const pick = document.getElementById("spotMapPick");
+    const frame = document.getElementById("spotMapFrame");
+    if (pick && frame) {
+      pick.onchange = () => {
+        state.__ui.spotMapIdx = Number(pick.value || 0);
+        const label = pick.options[pick.selectedIndex]?.textContent || (state.trip.destination || "South Korea");
+        frame.src = `https://www.google.com/maps?q=${encodeURIComponent(label)}&output=embed`;
+        markDirty();
+      };
+    }
+
 
     document.getElementById("btnAddSpot").onclick = () => openSpotModal();
     document.getElementById("btnMakeMap").onclick = () => {
@@ -1434,7 +1544,7 @@
                   }).join("")
                 }
               </div>
-              <div class="hint">Packing lists start from your Excel template; edit freely.</div>
+              <div class="hint"></div>
             </div>
 
             <div>
@@ -1558,7 +1668,7 @@
                 `).join("")
               }
             </div>
-            <div class="hint">Voting is stored in your browser. Use Export/Import to sync with the group.</div>
+            <div class="hint"></div>
           </div>
         </section>
 
@@ -1581,7 +1691,7 @@
                 `).join("")
               }
             </div>
-            <div class="hint">Great for: a shared Google Map, booking pages, a Notion doc, or a spreadsheet link.</div>
+            <div class="hint">Add details and links.</div>
           </div>
         </section>
       </div>
@@ -1643,14 +1753,7 @@
           </div>
           <div class="bd">
             <div class="hint">
-              Because this is a static site (no server), edits are saved to <strong>your browser</strong>.
-              To keep the group synced:
-              <ol>
-                <li>One person exports JSON</li>
-                <li>Posts it in the group chat</li>
-                <li>Everyone imports it</li>
-              </ol>
-              If you want a true multi-user live site, I can upgrade this to a Firebase/Supabase backend.
+              Download Excel Summary.
             </div>
           </div>
         </section>
@@ -1670,8 +1773,6 @@
               </tbody>
             </table>
             <div class="hint">
-              Want the site to match your spreadsheet exactly (extra sheets/columns)?
-              Upload the latest Excel and I’ll wire in a one-click importer.
             </div>
           </div>
         </section>
@@ -1813,7 +1914,7 @@
     const people = travellers();
     openModal({
       title: "Add expense",
-      sub: "Log spend in AUD (site can store KRW too, but AUD drives split).",
+      sub: "AUD",
       bodyHtml: `
         <div class="split">
           <div>
@@ -1833,7 +1934,15 @@
               }
             </select>
           </div>
-        </div>
+        
+          <div>
+            <div class="muted" style="font-size:12px; font-weight:650; margin-bottom:6px;">Participants</div>
+            <div class="chips" id="exParts">
+              ${ people.map(p=>`<span class="chipBtn on" data-part="${esc(p)}">${esc(p)}</span>`).join("") }
+            </div>
+            <div class="hint" style="margin-top:8px">Toggle who paid.</div>
+          </div>
+</div>
 
         <div style="height:10px"></div>
 
@@ -1870,6 +1979,13 @@
       `
     });
 
+    document.querySelectorAll("#exParts .chipBtn").forEach(btn=>{
+      btn.onclick = () => {
+        btn.classList.toggle("on");
+        btn.classList.toggle("off");
+      };
+    });
+
     document.getElementById("exSave").onclick = () => {
       const category = document.getElementById("exCat").value;
       const description = document.getElementById("exDesc").value.trim();
@@ -1878,10 +1994,11 @@
       const paidBy = document.getElementById("exBy").value;
       const paid = document.getElementById("exPaid").checked;
       const date = document.getElementById("exDate").value;
+      const parts = Array.from(document.querySelectorAll("#exParts .chipBtn.on")).map(el=>el.dataset.part);
       if (!category) return alert("Category required.");
       state.budget.expenses.unshift({
         category, description, currency: "$",
-        aud, krw, paid, paidBy, date, notes:""
+        aud, krw, paid, paidBy, date, participants: parts, notes:""
       });
       // bump category actual
       const cat = state.budget.categories.find(c=>c.category===category);
@@ -2351,7 +2468,5 @@
   </script>
 </body>
 </html>
-
-
 
 
