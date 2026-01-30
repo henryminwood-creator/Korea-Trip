@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Churros take South Korea</title>
+  <meta name="description" content="Shared trip hub · lightweight + offline-friendly" />
+  <style>
+    :root{
+      --bg:#fbfbfd;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --text:#0f172a;
+      --border:#e5e7eb;
+      --shadow: 0 10px 30px rgba(2,6,23,.08);
+      --shadow2: 0 6px 18px rgba(2,6,23,.06);
+      --accent:#4f46e5; /* indigo */
+      --accent2:#06b6d4; /* cyan */
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --radius:18px;
+      --radius2:14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 600px at 10% -10%, rgba(79,70,229,.16), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(6,182,212,.14), transparent 55%),
+        var(--bg);
+    }
+    a{color:inherit}
+    .wrap{max-width:1200px;margin:0 auto;padding:22px 18px 36px}
+    header{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:16px 18px;
+      background:rgba(255,255,255,.75);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(10px);
+      position: sticky; top: 14px; z-index: 20;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px; min-width: 240px;
+    }
+    .logo{
+      width:40px;height:40px;border-radius:14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 10px 20px rgba(79,70,229,.25);
+      position:relative; overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute; inset:-20px;
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.6), transparent 35%);
+      transform: rotate(18deg);
+    }
+    h1{
+      font-size:18px;line-height:1.15;margin:0;
+      letter-spacing:-.02em;
+    }
+    .sub{
+      font-size:12px;color:var(--muted);margin-top:3px;
+    }
+    .right{
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;
+    }
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;border:1px solid var(--border);
+      background:rgba(255,255,255,.7);
+      font-size:12px;color:var(--muted);
+    }
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--good)}
+    .btn{
+      appearance:none;border:1px solid var(--border);
+      background: white;
+      padding:10px 12px;border-radius:12px;
+      font-weight:600;font-size:13px;
+      box-shadow: 0 6px 16px rgba(2,6,23,.06);
+      cursor:pointer;
+      transition: transform .06s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    .btn:hover{border-color:#d1d5db; box-shadow: 0 10px 22px rgba(2,6,23,.08)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{
+      border-color: transparent;
+      color:white;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 14px 26px rgba(79,70,229,.18);
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.6);
+    }
+    nav{
+      display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+      margin:18px 0 14px;
+    }
+    .tab{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.75);
+      padding:10px 12px;border-radius:999px;
+      font-weight:700;font-size:13px;color:#334155;
+      cursor:pointer;
+      transition: background .2s ease, transform .06s ease;
+    }
+    .tab.active{
+      background: linear-gradient(135deg, rgba(79,70,229,.14), rgba(6,182,212,.14));
+      border-color: rgba(79,70,229,.28);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr}
+      header{position:relative; top:auto}
+      .brand{min-width: auto}
+    }
+    .card{
+      background: rgba(255,255,255,.86);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card h2{
+      margin:0 0 10px;
+      font-size:15px; letter-spacing:-.01em;
+    }
+    .muted{color:var(--muted)}
+    .kpiRow{display:grid;grid-template-columns: repeat(3,1fr); gap:10px}
+    @media (max-width:700px){ .kpiRow{grid-template-columns:1fr} }
+    .kpi{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.7);
+      border-radius: var(--radius2);
+      padding:12px;
+    }
+    .kpi .label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .kpi .value{font-size:18px;font-weight:900;letter-spacing:-.02em}
+    .kpi .small{font-size:12px;color:var(--muted);margin-top:4px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .field{
+      display:flex;flex-direction:column;gap:6px; min-width: 180px; flex: 1;
+    }
+    label{font-size:12px;color:var(--muted)}
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius: 12px;
+      padding:10px 10px;
+      background: rgba(255,255,255,.85);
+      font: inherit;
+      outline:none;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(79,70,229,.55);
+      box-shadow: 0 0 0 4px rgba(79,70,229,.12);
+    }
+    textarea{min-height:92px; resize: vertical}
+    table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow:hidden;
+      border-radius: 14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.7);
+    }
+    th, td{
+      padding:10px 10px;
+      border-bottom:1px solid var(--border);
+      font-size:13px;
+      vertical-align: top;
+    }
+    th{
+      text-align:left;
+      font-size:12px;
+      color:#475569;
+      background: rgba(2,6,23,.03);
+      font-weight:800;
+    }
+    tr:last-child td{border-bottom:none}
+    .tag{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:4px 8px;border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.8);
+      font-size:12px;
+      color:#334155;
+    }
+    .tag .s{width:7px;height:7px;border-radius:50%}
+    .s.good{background:var(--good)}
+    .s.warn{background:var(--warn)}
+    .s.bad{background:var(--bad)}
+    .section{display:none}
+    .section.active{display:block}
+    .hr{height:1px;background:var(--border);margin:14px 0}
+    .smallmono{font-family:var(--mono); font-size:12px; color:#475569}
+    .toast{
+      position:fixed; left:50%; bottom:18px;
+      transform:translateX(-50%);
+      background: rgba(15,23,42,.92);
+      color:white;
+      padding:10px 12px;
+      border-radius: 999px;
+      font-size:13px;
+      box-shadow: 0 18px 40px rgba(2,6,23,.35);
+      opacity:0; pointer-events:none;
+      transition: opacity .25s ease, transform .25s ease;
+      z-index: 50;
+    }
+    .toast.show{opacity:1; transform: translateX(-50%) translateY(-4px)}
+    .footer{
+      margin-top:14px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .people{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    .avatar{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      background: rgba(255,255,255,.75);
+      border:1px solid var(--border);
+      border-radius: 999px;
+      font-size:13px;
+      font-weight:700;
+    }
+    .bubble{
+      width:26px;height:26px;border-radius:999px;
+      display:grid;place-items:center;
+      color:white;
+      font-weight:900;
+      background: linear-gradient(135deg, rgba(79,70,229,.9), rgba(6,182,212,.9));
+      box-shadow: 0 10px 18px rgba(79,70,229,.18);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Churros take South Korea</h1>
+          <div class="sub">Shared trip hub · lightweight + offline-friendly · local-first</div>
+        </div>
+      </div>
+
+      <div class="right">
+        <span class="pill" title="All data stays in your browser unless you export it.">
+          <span class="dot"></span>
+          Saved locally
+        </span>
+        <button class="btn ghost" id="btnQuickAdd">Quick add</button>
+        <button class="btn" id="btnExport">Export</button>
+        <button class="btn" id="btnImport">Import</button>
+        <button class="btn primary" id="btnShare">Copy share note</button>
+      </div>
+    </header>
+
+    <nav>
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="itinerary">Itinerary</button>
+      <button class="tab" data-tab="budget">Budget</button>
+      <button class="tab" data-tab="decisions">Decisions</button>
+      <button class="tab" data-tab="packing">Packing</button>
+    </nav>
+
+    <!-- OVERVIEW -->
+    <section class="section active" id="overview">
+      <div class="grid">
+        <div class="card">
+          <h2>Trip snapshot</h2>
+
+          <div class="row" style="margin-bottom:12px">
+            <div class="field">
+              <label>Destination</label>
+              <input id="destination" placeholder="e.g., South Korea" />
+            </div>
+            <div class="field">
+              <label>Dates</label>
+              <input id="dates" placeholder="e.g., 3–14 May 2026" />
+            </div>
+            <div class="field">
+              <label>Home base</label>
+              <input id="homebase" placeholder="e.g., Seoul" />
+            </div>
+          </div>
+
+          <div class="kpiRow">
+            <div class="kpi">
+              <div class="label">Days planned</div>
+              <div class="value" id="kpiDays">0</div>
+              <div class="small">Based on itinerary rows</div>
+            </div>
+            <div class="kpi">
+              <div class="label">Budget (total)</div>
+              <div class="value" id="kpiBudget">$0</div>
+              <div class="small">Sum of budget items</div>
+            </div>
+            <div class="kpi">
+              <div class="label">Owed / settled</div>
+              <div class="value" id="kpiSplit">$0 / $0</div>
+              <div class="small">Total owed vs paid</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <h2>People</h2>
+          <div class="people" id="people"></div>
+
+          <div class="hr"></div>
+
+          <h2>Notes</h2>
+          <textarea id="notes" placeholder="Drop links, flight numbers, address, anything…"></textarea>
+
+        </div>
+
+        <div class="card">
+          <h2>Quick add</h2>
+          <div class="muted" style="font-size:13px;margin-bottom:10px">
+            Add anything fast — it’ll sort into the right place later.
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Type</label>
+              <select id="qaType">
+                <option value="itinerary">Itinerary item</option>
+                <option value="budget">Budget item</option>
+                <option value="decision">Decision</option>
+                <option value="packing">Packing item</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Who (optional)</label>
+              <select id="qaWho"></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Title</label>
+              <input id="qaTitle" placeholder="e.g., Book DMZ tour" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Details</label>
+              <input id="qaDetails" placeholder="Time, link, price, location…" />
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="btn primary" id="qaAdd">Add</button>
+            <button class="btn" id="qaClear">Clear</button>
+          </div>
+
+          <div class="hr"></div>
+
+          <h2>How to share</h2>
+          <div class="muted" style="font-size:13px;line-height:1.55">
+            This page is “local-first”: each person’s browser has its own copy.<br>
+            Use <b>Export</b> to send the JSON to your friends, and <b>Import</b> to merge.
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="smallmono" id="saveInfo"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ITINERARY -->
+    <section class="section" id="itinerary">
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <h2 style="margin:0">Itinerary</h2>
+          <div class="row">
+            <button class="btn" id="addItin">Add row</button>
+            <button class="btn" id="clearItin">Clear</button>
+          </div>
+        </div>
+        <div class="muted" style="font-size:13px;margin:8px 0 12px">
+          Tip: keep it simple — date, time, place, and the vibe.
+        </div>
+
+        <div style="overflow:auto">
+          <table id="itinTable">
+            <thead>
+              <tr>
+                <th style="min-width:120px">Date</th>
+                <th style="min-width:90px">Time</th>
+                <th style="min-width:220px">Plan</th>
+                <th style="min-width:180px">Location / Link</th>
+                <th style="min-width:120px">Owner</th>
+                <th style="min-width:120px">Status</th>
+                <th style="min-width:70px"></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- BUDGET -->
+    <section class="section" id="budget">
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <h2 style="margin:0">Budget & split</h2>
+          <div class="row">
+            <button class="btn" id="addBudget">Add item</button>
+            <button class="btn" id="clearBudget">Clear</button>
+          </div>
+        </div>
+
+        <div class="muted" style="font-size:13px;margin:8px 0 12px">
+          Track costs + who paid. It’ll calculate the split evenly across 6 people (editable later).
+        </div>
+
+        <div style="overflow:auto">
+          <table id="budgetTable">
+            <thead>
+              <tr>
+                <th style="min-width:170px">Item</th>
+                <th style="min-width:110px">Category</th>
+                <th style="min-width:100px">Cost</th>
+                <th style="min-width:130px">Paid by</th>
+                <th style="min-width:130px">Split</th>
+                <th style="min-width:120px">Status</th>
+                <th style="min-width:70px"></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="hr"></div>
+        <div class="kpiRow">
+          <div class="kpi">
+            <div class="label">Total spend</div>
+            <div class="value" id="budTotal">$0</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Per-person (even split)</div>
+            <div class="value" id="budPer">$0</div>
+          </div>
+          <div class="kpi">
+            <div class="label">Items paid</div>
+            <div class="value" id="budPaid">0</div>
+            <div class="small">Out of <span id="budCount">0</span></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- DECISIONS -->
+    <section class="section" id="decisions">
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <h2 style="margin:0">Decisions</h2>
+          <div class="row">
+            <button class="btn" id="addDecision">Add</button>
+            <button class="btn" id="clearDecision">Clear</button>
+          </div>
+        </div>
+        <div class="muted" style="font-size:13px;margin:8px 0 12px">
+          Keep a list of open questions: where to stay, day trips, restaurants, etc.
+        </div>
+
+        <div style="overflow:auto">
+          <table id="decTable">
+            <thead>
+              <tr>
+                <th style="min-width:240px">Decision</th>
+                <th style="min-width:220px">Options / Notes</th>
+                <th style="min-width:130px">Owner</th>
+                <th style="min-width:140px">Priority</th>
+                <th style="min-width:90px"></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PACKING -->
+    <section class="section" id="packing">
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <h2 style="margin:0">Packing</h2>
+          <div class="row">
+            <button class="btn" id="addPack">Add</button>
+            <button class="btn" id="clearPack">Clear</button>
+          </div>
+        </div>
+
+        <div class="muted" style="font-size:13px;margin:8px 0 12px">
+          Shared checklist: group essentials + personal reminders.
+        </div>
+
+        <div style="overflow:auto">
+          <table id="packTable">
+            <thead>
+              <tr>
+                <th style="min-width:220px">Item</th>
+                <th style="min-width:140px">Type</th>
+                <th style="min-width:140px">Owner</th>
+                <th style="min-width:140px">Status</th>
+                <th style="min-width:90px"></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="footer">Built for Henry, Cordelia, Jesse, Oliver, Mikaela, and Amy · works offline · export/import for sharing</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <input type="file" id="fileInput" accept="application/json" style="display:none" />
+
+  <script>
+    // --- Local-first store ---
+    const PEOPLE = ["Henry","Cordelia","Jesse","Oliver","Mikaela","Amy"];
+    const STORAGE_KEY = "churros_take_sk_v1";
+
+    const $ = (q)=>document.querySelector(q);
+    const $$ = (q)=>Array.from(document.querySelectorAll(q));
+
+    function nowISO(){ return new Date().toISOString(); }
+    function money(n){
+      const v = Number(n||0);
+      return v.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});
+    }
+    function toast(msg){
+      const t = $("#toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(()=>t.classList.remove("show"), 1600);
+    }
+
+    const defaultData = {
+      meta: { title: "Churros take South Korea", created: nowISO(), updated: nowISO() },
+      overview: { destination: "South Korea", dates: "", homebase: "", notes: "" },
+      itinerary: [],
+      budget: [],
+      decisions: [],
+      packing: []
+    };
+
+    function load(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : structuredClone(defaultData);
+      }catch(e){
+        return structuredClone(defaultData);
+      }
+    }
+    function save(){
+      data.meta.updated = nowISO();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      $("#saveInfo").textContent = `Last saved: ${new Date(data.meta.updated).toLocaleString()}`;
+      recalcKPIs();
+    }
+
+    function uid(){ return Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2); }
+
+    // --- UI wiring ---
+    let data = load();
+
+    function initPeople(){
+      const wrap = $("#people");
+      wrap.innerHTML = "";
+      PEOPLE.forEach(p=>{
+        const el = document.createElement("div");
+        el.className = "avatar";
+        el.innerHTML = `<span class="bubble">${p.slice(0,1).toUpperCase()}</span><span>${p}</span>`;
+        wrap.appendChild(el);
+      });
+
+      const who = $("#qaWho");
+      who.innerHTML = `<option value="">—</option>` + PEOPLE.map(p=>`<option value="${p}">${p}</option>`).join("");
+    }
+
+    function initOverview(){
+      $("#destination").value = data.overview.destination || "";
+      $("#dates").value = data.overview.dates || "";
+      $("#homebase").value = data.overview.homebase || "";
+      $("#notes").value = data.overview.notes || "";
+
+      ["destination","dates","homebase","notes"].forEach(id=>{
+        $("#"+id).addEventListener("input", ()=>{
+          data.overview[id] = $("#"+id).value;
+          save();
+        });
+      });
+      $("#saveInfo").textContent = data.meta.updated ? `Last saved: ${new Date(data.meta.updated).toLocaleString()}` : "";
+    }
+
+    function tabInit(){
+      $$(".tab").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          $$(".tab").forEach(b=>b.classList.remove("active"));
+          btn.classList.add("active");
+          const t = btn.dataset.tab;
+          $$(".section").forEach(s=>s.classList.remove("active"));
+          $("#"+t).classList.add("active");
+          // lazy refresh
+          renderAll();
+          window.scrollTo({top:0,behavior:"smooth"});
+        });
+      });
+    }
+
+    // --- Rendering helpers ---
+    function statusTag(status){
+      const map = {
+        "planned": ["Planned","warn"],
+        "booked": ["Booked","good"],
+        "done": ["Done","good"],
+        "idea": ["Idea","warn"],
+        "open": ["Open","warn"],
+        "decided": ["Decided","good"],
+        "packed": ["Packed","good"],
+        "need": ["Need","warn"],
+        "paid": ["Paid","good"],
+        "unpaid": ["Unpaid","bad"]
+      };
+      const [label,cls] = map[status] || [status||"—","warn"];
+      return `<span class="tag"><span class="s ${cls}"></span>${label}</span>`;
+    }
+    function personSelect(value){
+      return `<select data-k="owner">
+        <option value="">—</option>
+        ${PEOPLE.map(p=>`<option value="${p}" ${p===value?"selected":""}>${p}</option>`).join("")}
+      </select>`;
+    }
+
+    // --- Itinerary ---
+    function renderItinerary(){
+      const tb = $("#itinTable tbody");
+      tb.innerHTML = "";
+      data.itinerary.forEach(row=>{
+        const tr = document.createElement("tr");
+        tr.dataset.id = row.id;
+        tr.innerHTML = `
+          <td><input data-k="date" value="${escapeHTML(row.date||"")}" placeholder="YYYY-MM-DD or text"></td>
+          <td><input data-k="time" value="${escapeHTML(row.time||"")}" placeholder="e.g., 10:30"></td>
+          <td><input data-k="plan" value="${escapeHTML(row.plan||"")}" placeholder="What are we doing?"></td>
+          <td><input data-k="where" value="${escapeHTML(row.where||"")}" placeholder="Address / link"></td>
+          <td>${personSelect(row.owner||"")}</td>
+          <td>
+            <select data-k="status">
+              ${opt(["planned","booked","done"], row.status)}
+            </select>
+          </td>
+          <td><button class="btn" data-del="1">Delete</button></td>
+        `;
+        tb.appendChild(tr);
+      });
+
+      tb.oninput = (e)=>{
+        const tr = e.target.closest("tr");
+        if(!tr) return;
+        const id = tr.dataset.id;
+        const k = e.target.dataset.k;
+        if(!k) return;
+        const r = data.itinerary.find(x=>x.id===id);
+        r[k] = e.target.value;
+        save();
+      };
+      tb.onclick = (e)=>{
+        const del = e.target.closest("[data-del]");
+        if(!del) return;
+        const tr = e.target.closest("tr");
+        data.itinerary = data.itinerary.filter(x=>x.id!==tr.dataset.id);
+        save(); renderItinerary(); toast("Deleted");
+      };
+    }
+
+    // --- Budget ---
+    function renderBudget(){
+      const tb = $("#budgetTable tbody");
+      tb.innerHTML = "";
+      data.budget.forEach(row=>{
+        const tr = document.createElement("tr");
+        tr.dataset.id = row.id;
+        tr.innerHTML = `
+          <td><input data-k="item" value="${escapeHTML(row.item||"")}" placeholder="e.g., Accommodation"></td>
+          <td><input data-k="category" value="${escapeHTML(row.category||"")}" placeholder="e.g., Stay"></td>
+          <td><input data-k="cost" type="number" min="0" step="1" value="${escapeHTML(row.cost||0)}"></td>
+          <td>${personSelect(row.paidBy||"")}</td>
+          <td>
+            <select data-k="split">
+              ${opt(["even-6","custom"], row.split||"even-6")}
+            </select>
+          </td>
+          <td>
+            <select data-k="status">
+              ${opt(["unpaid","paid"], row.status||"unpaid")}
+            </select>
+          </td>
+          <td><button class="btn" data-del="1">Delete</button></td>
+        `;
+        // tweak paidBy select
+        tr.querySelector('select[data-k="owner"]').dataset.k = "paidBy";
+        tb.appendChild(tr);
+      });
+
+      tb.oninput = (e)=>{
+        const tr = e.target.closest("tr");
+        if(!tr) return;
+        const id = tr.dataset.id;
+        const k = e.target.dataset.k;
+        if(!k) return;
+        const r = data.budget.find(x=>x.id===id);
+        r[k] = (k==="cost") ? Number(e.target.value||0) : e.target.value;
+        save();
+      };
+      tb.onclick = (e)=>{
+        const del = e.target.closest("[data-del]");
+        if(!del) return;
+        const tr = e.target.closest("tr");
+        data.budget = data.budget.filter(x=>x.id!==tr.dataset.id);
+        save(); renderBudget(); toast("Deleted");
+      };
+    }
+
+    // --- Decisions ---
+    function renderDecisions(){
+      const tb = $("#decTable tbody");
+      tb.innerHTML = "";
+      data.decisions.forEach(row=>{
+        const tr = document.createElement("tr");
+        tr.dataset.id = row.id;
+        tr.innerHTML = `
+          <td><input data-k="decision" value="${escapeHTML(row.decision||"")}" placeholder="What needs deciding?"></td>
+          <td><input data-k="notes" value="${escapeHTML(row.notes||"")}" placeholder="Options / links / pros/cons"></td>
+          <td>${personSelect(row.owner||"")}</td>
+          <td>
+            <select data-k="priority">
+              ${opt(["low","medium","high"], row.priority||"medium")}
+            </select>
+          </td>
+          <td><button class="btn" data-del="1">Delete</button></td>
+        `;
+        tb.appendChild(tr);
+      });
+
+      tb.oninput = (e)=>{
+        const tr = e.target.closest("tr");
+        if(!tr) return;
+        const id = tr.dataset.id;
+        const k = e.target.dataset.k;
+        if(!k) return;
+        const r = data.decisions.find(x=>x.id===id);
+        r[k] = e.target.value;
+        save();
+      };
+      tb.onclick = (e)=>{
+        const del = e.target.closest("[data-del]");
+        if(!del) return;
+        const tr = e.target.closest("tr");
+        data.decisions = data.decisions.filter(x=>x.id!==tr.dataset.id);
+        save(); renderDecisions(); toast("Deleted");
+      };
+    }
+
+    // --- Packing ---
+    function renderPacking(){
+      const tb = $("#packTable tbody");
+      tb.innerHTML = "";
+      data.packing.forEach(row=>{
+        const tr = document.createElement("tr");
+        tr.dataset.id = row.id;
+        tr.innerHTML = `
+          <td><input data-k="item" value="${escapeHTML(row.item||"")}" placeholder="e.g., Universal adapter"></td>
+          <td>
+            <select data-k="type">
+              ${opt(["group","personal"], row.type||"group")}
+            </select>
+          </td>
+          <td>${personSelect(row.owner||"")}</td>
+          <td>
+            <select data-k="status">
+              ${opt(["need","packed"], row.status||"need")}
+            </select>
+          </td>
+          <td><button class="btn" data-del="1">Delete</button></td>
+        `;
+        tb.appendChild(tr);
+      });
+
+      tb.oninput = (e)=>{
+        const tr = e.target.closest("tr");
+        if(!tr) return;
+        const id = tr.dataset.id;
+        const k = e.target.dataset.k;
+        if(!k) return;
+        const r = data.packing.find(x=>x.id===id);
+        r[k] = e.target.value;
+        save();
+      };
+      tb.onclick = (e)=>{
+        const del = e.target.closest("[data-del]");
+        if(!del) return;
+        const tr = e.target.closest("tr");
+        data.packing = data.packing.filter(x=>x.id!==tr.dataset.id);
+        save(); renderPacking(); toast("Deleted");
+      };
+    }
+
+    function opt(options, selected){
+      return options.map(o=>`<option value="${o}" ${o===selected?"selected":""}>${pretty(o)}</option>`).join("");
+    }
+    function pretty(x){
+      return (x||"").toString().replace(/-/g," ").replace(/\b\w/g, m=>m.toUpperCase());
+    }
+    function escapeHTML(s){
+      return String(s??"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+    }
+
+    // --- KPIs ---
+    function recalcKPIs(){
+      // days planned: number of unique non-empty dates
+      const dates = new Set(data.itinerary.map(r=>r.date).filter(Boolean));
+      $("#kpiDays").textContent = dates.size;
+
+      const total = data.budget.reduce((a,r)=>a+Number(r.cost||0),0);
+      $("#kpiBudget").textContent = money(total);
+
+      const owed = total; // simplistic: total owed by group
+      const paid = data.budget.filter(r=>r.status==="paid").reduce((a,r)=>a+Number(r.cost||0),0);
+      $("#kpiSplit").textContent = `${money(owed)} / ${money(paid)}`;
+
+      $("#budTotal").textContent = money(total);
+      $("#budPer").textContent = money(total / PEOPLE.length);
+      $("#budCount").textContent = data.budget.length;
+      $("#budPaid").textContent = data.budget.filter(r=>r.status==="paid").length;
+    }
+
+    function renderAll(){
+      renderItinerary();
+      renderBudget();
+      renderDecisions();
+      renderPacking();
+      recalcKPIs();
+    }
+
+    // --- Buttons ---
+    function btnInit(){
+      $("#addItin").onclick = ()=>{
+        data.itinerary.push({ id: uid(), date:"", time:"", plan:"", where:"", owner:"", status:"planned" });
+        save(); renderItinerary(); toast("Added itinerary row");
+      };
+      $("#clearItin").onclick = ()=>{
+        if(confirm("Clear ALL itinerary rows?")){ data.itinerary=[]; save(); renderItinerary(); }
+      };
+
+      $("#addBudget").onclick = ()=>{
+        data.budget.push({ id: uid(), item:"", category:"", cost:0, paidBy:"", split:"even-6", status:"unpaid" });
+        save(); renderBudget(); toast("Added budget item");
+      };
+      $("#clearBudget").onclick = ()=>{
+        if(confirm("Clear ALL budget rows?")){ data.budget=[]; save(); renderBudget(); }
+      };
+
+      $("#addDecision").onclick = ()=>{
+        data.decisions.push({ id: uid(), decision:"", notes:"", owner:"", priority:"medium" });
+        save(); renderDecisions(); toast("Added decision");
+      };
+      $("#clearDecision").onclick = ()=>{
+        if(confirm("Clear ALL decisions?")){ data.decisions=[]; save(); renderDecisions(); }
+      };
+
+      $("#addPack").onclick = ()=>{
+        data.packing.push({ id: uid(), item:"", type:"group", owner:"", status:"need" });
+        save(); renderPacking(); toast("Added packing item");
+      };
+      $("#clearPack").onclick = ()=>{
+        if(confirm("Clear ALL packing rows?")){ data.packing=[]; save(); renderPacking(); }
+      };
+
+      $("#qaAdd").onclick = ()=>{
+        const type = $("#qaType").value;
+        const who = $("#qaWho").value;
+        const title = $("#qaTitle").value.trim();
+        const det = $("#qaDetails").value.trim();
+        if(!title){ toast("Add a title first"); return; }
+
+        if(type==="itinerary"){
+          data.itinerary.push({ id: uid(), date:"", time:"", plan:title, where:det, owner:who, status:"planned" });
+        }else if(type==="budget"){
+          // allow user to type "$123" etc in details
+          const num = Number((det||"").replace(/[^0-9.]/g,"")) || 0;
+          data.budget.push({ id: uid(), item:title, category:"", cost:num, paidBy:who, split:"even-6", status:"unpaid" });
+        }else if(type==="decision"){
+          data.decisions.push({ id: uid(), decision:title, notes:det, owner:who, priority:"medium" });
+        }else if(type==="packing"){
+          data.packing.push({ id: uid(), item:title, type:"group", owner:who, status:"need" });
+        }
+        save();
+        renderAll();
+        $("#qaTitle").value=""; $("#qaDetails").value="";
+        toast("Added");
+      };
+      $("#qaClear").onclick = ()=>{
+        $("#qaTitle").value=""; $("#qaDetails").value="";
+        toast("Cleared");
+      };
+
+      $("#btnExport").onclick = ()=>{
+        const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "churros-take-south-korea.json";
+        a.click();
+        URL.revokeObjectURL(a.href);
+        toast("Exported JSON");
+      };
+
+      $("#btnImport").onclick = ()=> $("#fileInput").click();
+      $("#fileInput").onchange = async (e)=>{
+        const f = e.target.files?.[0];
+        if(!f) return;
+        try{
+          const txt = await f.text();
+          const incoming = JSON.parse(txt);
+          if(!incoming || !incoming.meta){ throw new Error("Not a valid export file"); }
+          // simple merge: replace everything
+          data = incoming;
+          save();
+          initOverview();
+          renderAll();
+          toast("Imported");
+        }catch(err){
+          alert("Import failed: " + err.message);
+        }finally{
+          $("#fileInput").value = "";
+        }
+      };
+
+      $("#btnShare").onclick = ()=>{
+        const msg =
+`Churros take South Korea — sharing plan:
+1) Open the site (or the local HTML file).
+2) Hit Export and send the JSON in the group chat.
+3) Whoever imports latest becomes “source of truth” and re-exports.
+
+People: Henry, Cordelia, Jesse, Oliver, Mikaela, Amy`;
+        navigator.clipboard?.writeText(msg);
+        toast("Copied share note");
+      };
+
+      $("#btnQuickAdd").onclick = ()=>{
+        // jump to overview and focus quick add
+        $$('.tab').forEach(b=>b.classList.remove("active"));
+        document.querySelector('.tab[data-tab="overview"]').classList.add("active");
+        $$('.section').forEach(s=>s.classList.remove("active"));
+        $("#overview").classList.add("active");
+        $("#qaTitle").focus();
+      };
+    }
+
+    // --- Boot ---
+    initPeople();
+    tabInit();
+    initOverview();
+    btnInit();
+
+    // If empty, seed some starter rows (so it doesn't feel blank)
+    if(data.itinerary.length===0 && data.budget.length===0 && data.decisions.length===0 && data.packing.length===0){
+      data.itinerary.push({ id: uid(), date:"", time:"", plan:"Arrive + check-in", where:"", owner:"Henry", status:"planned" });
+      data.budget.push({ id: uid(), item:"Accommodation deposit", category:"Stay", cost:0, paidBy:"", split:"even-6", status:"unpaid" });
+      data.decisions.push({ id: uid(), decision:"Choose neighbourhood to stay", notes:"Hongdae vs Myeongdong vs Insadong", owner:"", priority:"high" });
+      data.packing.push({ id: uid(), item:"Travel adapter (Type C/F)", type:"group", owner:"", status:"need" });
+      save();
+    } else {
+      recalcKPIs();
+      $("#saveInfo").textContent = `Last saved: ${new Date(data.meta.updated).toLocaleString()}`;
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>
